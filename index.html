@@ -3,931 +3,752 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="RunLog — Il tuo piano di corsa personalizzato, settimana dopo settimana. Gratuito per sempre.">
-<meta property="og:title" content="RunLog — Corri con un piano fatto per te">
-<meta property="og:description" content="Rispondi a 5 domande. Il tuo piano di allenamento personalizzato è pronto in secondi. Gratuito.">
-<title>RunLog — Il tuo piano di corsa personalizzato</title>
- 
+<meta name="description" content="RunZip — Piano di corsa AI, tracciamento allenamenti e gare. Gratuito.">
+<meta property="og:title" content="RunZip — Corri con un piano fatto per te">
+<meta property="og:description" content="Piano AI personalizzato, log allenamenti, tracciamento gare e PR. Gratuito.">
+<title>RunZip — Il tuo coach di corsa AI</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
- 
-<!-- Supabase -->
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
- 
+
 <style>
-/* ─── TOKENS ──────────────────────────────────────────── */
 :root {
-  --ink:    #1a1916;
-  --ink2:   #4a4843;
-  --ink3:   #9a9690;
-  --paper:  #f5f2ed;
-  --paper2: #ede9e2;
-  --paper3: #e2ddd6;
-  --lime:   #c8e840;
-  --lime2:  #a8c828;
-  --white:  #fefcf8;
-  --border: rgba(26,25,22,.1);
-  --border2:rgba(26,25,22,.18);
-  --r:      12px;
-  --r-sm:   7px;
-  --shadow: 0 2px 16px rgba(26,25,22,.08);
-  --shadow-lg: 0 8px 40px rgba(26,25,22,.12);
- 
-  --font-display: 'Instrument Serif', Georgia, serif;
-  --font-body:    'DM Sans', sans-serif;
-  --font-mono:    'DM Mono', monospace;
+  --bg:      #ffffff;
+  --bg2:     #f7f7f5;
+  --bg3:     #efede8;
+  --ink:     #1a1a18;
+  --ink2:    #4a4a47;
+  --ink3:    #9a9a96;
+  --ink4:    #c8c8c4;
+  --accent:  #e8632a;
+  --accent2: #d4541c;
+  --green:   #2d9e5e;
+  --blue:    #3b7dd8;
+  --purple:  #7c5cbf;
+  --border:  rgba(26,26,24,.08);
+  --border2: rgba(26,26,24,.14);
+  --r:       8px;
+  --r-sm:    5px;
+  --r-lg:    14px;
+  --shadow:  0 1px 8px rgba(26,26,24,.06), 0 0 0 1px rgba(26,26,24,.04);
+  --shadow-md: 0 4px 24px rgba(26,26,24,.10), 0 0 0 1px rgba(26,26,24,.04);
+  --shadow-lg: 0 12px 48px rgba(26,26,24,.14);
+
+  --font-display: 'Lora', Georgia, serif;
+  --font-body:    'Sora', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
 }
- 
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
- 
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   font-family: var(--font-body);
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
   min-height: 100vh;
   overflow-x: hidden;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
- 
-/* ─── PAGES ───────────────────────────────────────────── */
+
+/* PAGES */
 .page { display: none; min-height: 100vh; }
 .page.active { display: block; }
- 
-/* ─── BUTTONS ─────────────────────────────────────────── */
+
+/* BUTTONS */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 24px; border-radius: 100px;
-  font-family: var(--font-body); font-size: 15px; font-weight: 500;
-  cursor: pointer; border: none; transition: all .2s; text-decoration: none;
-  white-space: nowrap;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 20px; border-radius: var(--r);
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  cursor: pointer; border: none; transition: all .15s; text-decoration: none;
+  white-space: nowrap; letter-spacing: -.01em;
 }
-.btn-primary {
-  background: var(--ink); color: var(--white);
-}
-.btn-primary:hover { background: #333; transform: translateY(-1px); box-shadow: var(--shadow); }
-.btn-lime {
-  background: var(--lime); color: var(--ink);
-}
-.btn-lime:hover { background: var(--lime2); transform: translateY(-1px); }
-.btn-ghost {
-  background: transparent; color: var(--ink2);
-  border: 1.5px solid var(--border2);
-}
-.btn-ghost:hover { border-color: var(--ink2); color: var(--ink); }
-.btn-sm { padding: 8px 16px; font-size: 13px; }
-.btn-lg { padding: 16px 36px; font-size: 17px; }
- 
-/* ─── TAGS ────────────────────────────────────────────── */
+.btn-primary { background: var(--ink); color: #fff; }
+.btn-primary:hover { background: #333; }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { background: var(--accent2); }
+.btn-ghost { background: transparent; color: var(--ink2); border: 1px solid var(--border2); }
+.btn-ghost:hover { border-color: var(--ink3); color: var(--ink); background: var(--bg2); }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+.btn-lg { padding: 13px 28px; font-size: 15px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* TAGS */
 .tag {
-  display: inline-block; padding: 3px 10px; border-radius: 100px;
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 4px;
   font-size: 11px; font-weight: 500; font-family: var(--font-mono);
-  letter-spacing: .04em;
+  letter-spacing: .02em;
 }
-.tag-aerobico { background: #e8f5e0; color: #2d6b1a; border: 1px solid #c8e0b8; }
-.tag-ritmo    { background: #fef3e0; color: #7a4e0a; border: 1px solid #f0d8a0; }
-.tag-velocita { background: #ede8fc; color: #4a3898; border: 1px solid #ccc4f8; }
-.tag-mobilita { background: #e0f5f2; color: #0a5a52; border: 1px solid #b8e4df; }
-.tag-done     { background: #e8f5e0; color: #2d6b1a; border: 1px solid #c8e0b8; }
- 
-/* ─── FORMS ───────────────────────────────────────────── */
-.form-group { margin-bottom: 16px; }
+.tag-aerobico { background: #e6f4ec; color: #1a6b3c; }
+.tag-ritmo    { background: #fef0e6; color: #8a4010; }
+.tag-velocita { background: #eeebf8; color: #4a2898; }
+.tag-mobilita { background: #e6f4f4; color: #0a5a52; }
+.tag-done     { background: #e6f4ec; color: #1a6b3c; }
+.tag-gara     { background: #fdedf0; color: #8a1030; }
+
+/* FORMS */
+.form-group { margin-bottom: 14px; }
 .form-label {
-  display: block; font-size: 11px; font-weight: 500;
+  display: block; font-size: 11px; font-weight: 600;
   font-family: var(--font-mono); text-transform: uppercase;
-  letter-spacing: .08em; color: var(--ink3); margin-bottom: 6px;
+  letter-spacing: .07em; color: var(--ink3); margin-bottom: 5px;
 }
 .form-input, .form-select, .form-textarea {
-  width: 100%; padding: 11px 14px;
-  background: var(--white); border: 1.5px solid var(--border2);
+  width: 100%; padding: 9px 12px;
+  background: var(--bg); border: 1px solid var(--border2);
   border-radius: var(--r-sm); color: var(--ink);
-  font-family: var(--font-body); font-size: 15px;
-  transition: border-color .15s, box-shadow .15s;
+  font-family: var(--font-body); font-size: 14px;
+  transition: border-color .12s, box-shadow .12s;
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
-  outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(26,25,22,.06);
+  outline: none; border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(26,26,24,.06);
 }
-.form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
- 
-/* ─── MODAL ───────────────────────────────────────────── */
+.form-textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+/* MODAL */
 .modal-backdrop {
-  position: fixed; inset: 0; background: rgba(26,25,22,.45);
-  backdrop-filter: blur(4px);
+  position: fixed; inset: 0; background: rgba(26,26,24,.4);
+  backdrop-filter: blur(6px);
   display: flex; align-items: center; justify-content: center;
   z-index: 900; opacity: 0; pointer-events: none;
-  transition: opacity .2s;
+  transition: opacity .18s;
 }
 .modal-backdrop.open { opacity: 1; pointer-events: all; }
 .modal {
-  background: var(--white); border-radius: 20px;
+  background: var(--bg); border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg);
-  width: 480px; max-width: 95vw; max-height: 92vh;
+  width: 460px; max-width: 95vw; max-height: 90vh;
   overflow-y: auto;
-  transform: translateY(16px); transition: transform .25s;
+  transform: translateY(12px) scale(.98); transition: transform .2s;
 }
-.modal-backdrop.open .modal { transform: translateY(0); }
+.modal-backdrop.open .modal { transform: translateY(0) scale(1); }
 .modal-head {
-  padding: 24px 28px 20px;
+  padding: 22px 24px 18px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between;
 }
-.modal-title { font-family: var(--font-display); font-size: 22px; }
+.modal-title { font-family: var(--font-display); font-size: 20px; }
 .modal-close {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--paper2); border: none; cursor: pointer;
-  font-size: 16px; color: var(--ink2); display: flex; align-items: center; justify-content: center;
-  transition: background .15s;
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--bg2); border: none; cursor: pointer;
+  font-size: 14px; color: var(--ink3); display: flex; align-items: center; justify-content: center;
+  transition: background .12s;
 }
-.modal-close:hover { background: var(--paper3); }
-.modal-body { padding: 24px 28px; }
-.modal-footer { padding: 16px 28px 24px; display: flex; gap: 8px; justify-content: flex-end; }
- 
-/* ─── TOAST ───────────────────────────────────────────── */
+.modal-close:hover { background: var(--bg3); color: var(--ink); }
+.modal-body { padding: 20px 24px; }
+.modal-footer { padding: 14px 24px 22px; display: flex; gap: 8px; justify-content: flex-end; }
+
+/* TOAST */
 #toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-  background: var(--ink); color: var(--white);
-  padding: 12px 20px; border-radius: 100px;
-  font-size: 14px; font-weight: 500;
-  opacity: 0; transition: all .3s; z-index: 9999;
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px);
+  background: var(--ink); color: #fff;
+  padding: 10px 18px; border-radius: var(--r);
+  font-size: 13px; font-weight: 500;
+  opacity: 0; transition: all .25s; z-index: 9999;
   pointer-events: none; white-space: nowrap;
+  box-shadow: var(--shadow-md);
 }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
- 
-/* ══════════════════════════════════════════════════════
-   LANDING PAGE
-══════════════════════════════════════════════════════ */
-#page-landing {
-  background: var(--paper);
+
+/* SPINNER */
+.spinner {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
+  animation: spin .65s linear infinite; flex-shrink: 0;
 }
- 
-/* NAV */
+.spinner-dark {
+  border-color: var(--border2); border-top-color: var(--ink);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════════════
+   LANDING
+══════════════════════════════════════ */
+#page-landing { background: var(--bg); }
+
 .nav {
   position: sticky; top: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 48px;
-  background: rgba(245,242,237,.88); backdrop-filter: blur(12px);
+  padding: 14px 48px;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
 .nav-logo {
-  font-family: var(--font-display); font-size: 22px; color: var(--ink);
-  text-decoration: none; letter-spacing: -.3px;
+  font-family: var(--font-display); font-size: 20px; color: var(--ink);
+  text-decoration: none; letter-spacing: -.3px; display: flex; align-items: center; gap: 8px;
 }
-.nav-logo span { color: var(--lime2); }
-.nav-actions { display: flex; gap: 10px; align-items: center; }
- 
-/* HERO */
+.nav-logo-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  display: inline-block;
+}
+.nav-actions { display: flex; gap: 8px; align-items: center; }
+
 .hero {
-  max-width: 900px; margin: 0 auto;
-  padding: 100px 48px 80px;
+  max-width: 860px; margin: 0 auto;
+  padding: 96px 48px 72px;
   text-align: center;
 }
-.hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--white); border: 1px solid var(--border2);
-  border-radius: 100px; padding: 6px 14px;
-  font-size: 12px; font-weight: 500; color: var(--ink2);
-  font-family: var(--font-mono);
-  margin-bottom: 28px;
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 100px; padding: 5px 12px;
+  font-size: 11px; font-weight: 500; color: var(--ink3);
+  font-family: var(--font-mono); margin-bottom: 32px;
 }
-.hero-eyebrow::before {
-  content: ''; width: 7px; height: 7px; border-radius: 50%;
-  background: var(--lime2); display: inline-block;
+.hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
 }
 .hero-title {
-  font-family: var(--font-display); font-size: clamp(44px, 7vw, 80px);
-  line-height: 1.08; letter-spacing: -.5px; color: var(--ink);
-  margin-bottom: 24px;
+  font-family: var(--font-display); font-size: clamp(42px, 6.5vw, 76px);
+  line-height: 1.08; letter-spacing: -.5px; color: var(--ink); margin-bottom: 20px;
 }
-.hero-title em { font-style: italic; color: var(--ink2); }
+.hero-title em { font-style: italic; color: var(--ink3); }
 .hero-sub {
-  font-size: 18px; color: var(--ink2); line-height: 1.6;
-  max-width: 520px; margin: 0 auto 40px; font-weight: 300;
+  font-size: 17px; color: var(--ink2); line-height: 1.7;
+  max-width: 500px; margin: 0 auto 36px; font-weight: 300;
 }
-.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
- 
-.hero-visual {
-  max-width: 780px; margin: 64px auto 0;
-  background: var(--white); border: 1px solid var(--border2);
-  border-radius: 20px; box-shadow: var(--shadow-lg);
-  overflow: hidden;
+.hero-cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+.hero-preview {
+  max-width: 760px; margin: 64px auto 0;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-md);
 }
-.hero-visual-bar {
-  background: var(--paper2); border-bottom: 1px solid var(--border);
-  padding: 12px 20px; display: flex; gap: 6px; align-items: center;
+.hp-bar {
+  background: var(--bg3); border-bottom: 1px solid var(--border);
+  padding: 10px 16px; display: flex; gap: 5px; align-items: center;
 }
-.wdot { width: 10px; height: 10px; border-radius: 50%; }
-.wdot-r { background: #ff6059; }
-.wdot-y { background: #ffbc2e; }
-.wdot-g { background: #28c941; }
-.hero-visual-content { padding: 20px; }
-.hvc-week {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-  margin-bottom: 16px;
+.hp-dot { width: 9px; height: 9px; border-radius: 50%; }
+.hp-content { padding: 20px; }
+.hp-week { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.hp-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 12px; position: relative;
 }
-.hvc-card {
-  background: var(--paper); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 12px;
-  position: relative; overflow: hidden;
-}
-.hvc-label { font-size: 10px; font-family: var(--font-mono); color: var(--ink3); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .06em; }
-.hvc-name { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 3px; line-height: 1.3; }
-.hvc-meta { font-size: 11px; color: var(--ink3); font-family: var(--font-mono); }
-.hvc-accent { position: absolute; top: 0; right: 0; width: 3px; height: 100%; }
-.hvc-streak { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; }
-.hvc-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
- 
-/* FEATURES */
+.hp-card-top { font-size: 10px; font-family: var(--font-mono); color: var(--ink3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .05em; }
+.hp-card-name { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.hp-card-meta { font-size: 11px; color: var(--ink3); font-family: var(--font-mono); }
+.hp-stripe { position: absolute; top: 0; left: 0; width: 3px; height: 100%; border-radius: var(--r) 0 0 var(--r); }
+
 .features {
-  max-width: 1100px; margin: 0 auto;
-  padding: 80px 48px;
+  max-width: 1060px; margin: 0 auto; padding: 80px 48px;
 }
-.section-label {
+.section-eyebrow {
   font-size: 11px; font-family: var(--font-mono); font-weight: 500;
-  text-transform: uppercase; letter-spacing: .1em; color: var(--ink3);
-  margin-bottom: 16px;
+  text-transform: uppercase; letter-spacing: .1em; color: var(--ink3); margin-bottom: 12px;
 }
-.features-title {
-  font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px);
-  line-height: 1.15; color: var(--ink); margin-bottom: 56px;
-  max-width: 500px;
+.section-title {
+  font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 44px);
+  line-height: 1.18; color: var(--ink); margin-bottom: 48px; max-width: 460px;
 }
-.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
 .feature-card {
-  background: var(--white); border: 1px solid var(--border);
-  border-radius: 16px; padding: 28px;
-  transition: transform .2s, box-shadow .2s;
+  background: var(--bg); padding: 28px 24px;
+  transition: background .15s;
 }
-.feature-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-.feature-icon {
-  width: 44px; height: 44px; border-radius: 12px;
-  background: var(--paper2); display: flex; align-items: center;
-  justify-content: center; font-size: 20px; margin-bottom: 16px;
-}
-.feature-title { font-size: 17px; font-weight: 500; margin-bottom: 8px; }
-.feature-desc { font-size: 14px; color: var(--ink2); line-height: 1.6; font-weight: 300; }
- 
-/* HOW IT WORKS */
-.how {
-  background: var(--ink); color: var(--white);
-  padding: 80px 48px;
-}
-.how-inner { max-width: 900px; margin: 0 auto; }
-.how .section-label { color: rgba(255,255,255,.4); }
-.how-title {
-  font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px);
-  line-height: 1.15; margin-bottom: 56px;
-}
-.how-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-.how-step { position: relative; }
-.how-step::after {
-  content: '→'; position: absolute; right: -20px; top: 12px;
-  color: rgba(255,255,255,.2); font-size: 20px;
-}
-.how-step:last-child::after { display: none; }
-.how-num {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
-  color: var(--lime2); letter-spacing: .08em; margin-bottom: 12px;
-}
-.how-step-title { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
-.how-step-desc { font-size: 14px; color: rgba(255,255,255,.55); line-height: 1.65; font-weight: 300; }
- 
-/* CTA SECTION */
-.cta-section {
-  max-width: 700px; margin: 0 auto;
-  padding: 100px 48px;
-  text-align: center;
-}
-.cta-section h2 {
-  font-family: var(--font-display); font-size: clamp(36px, 5vw, 56px);
-  line-height: 1.1; margin-bottom: 20px;
-}
-.cta-section p {
-  font-size: 17px; color: var(--ink2); font-weight: 300;
-  margin-bottom: 36px; line-height: 1.6;
-}
- 
-/* FOOTER */
+.feature-card:hover { background: var(--bg2); }
+.feature-icon { font-size: 22px; margin-bottom: 14px; display: block; }
+.feature-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.feature-desc { font-size: 13px; color: var(--ink2); line-height: 1.65; font-weight: 300; }
+
+.how { background: var(--ink); color: #fff; padding: 80px 48px; }
+.how-inner { max-width: 860px; margin: 0 auto; }
+.how .section-eyebrow { color: rgba(255,255,255,.35); }
+.how-title { font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 44px); line-height: 1.18; margin-bottom: 52px; }
+.how-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.how-step-num { font-family: var(--font-mono); font-size: 10px; font-weight: 500; color: var(--accent); letter-spacing: .08em; margin-bottom: 10px; }
+.how-step-title { font-size: 16px; font-weight: 500; margin-bottom: 7px; }
+.how-step-desc { font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.7; font-weight: 300; }
+
+.cta-section { max-width: 640px; margin: 0 auto; padding: 96px 48px; text-align: center; }
+.cta-section h2 { font-family: var(--font-display); font-size: clamp(32px, 4.5vw, 52px); line-height: 1.1; margin-bottom: 16px; }
+.cta-section p { font-size: 16px; color: var(--ink2); font-weight: 300; margin-bottom: 32px; line-height: 1.6; }
+
 footer {
-  border-top: 1px solid var(--border);
-  padding: 32px 48px;
+  border-top: 1px solid var(--border); padding: 28px 48px;
   display: flex; align-items: center; justify-content: space-between;
-  font-size: 13px; color: var(--ink3);
+  font-size: 12px; color: var(--ink3);
 }
-.footer-logo { font-family: var(--font-display); font-size: 18px; color: var(--ink); }
-.footer-logo span { color: var(--lime2); }
- 
-/* ══════════════════════════════════════════════════════
-   ONBOARDING (5 domande + generazione piano)
-══════════════════════════════════════════════════════ */
-#page-onboarding {
-  background: var(--paper);
-  display: flex; flex-direction: column; min-height: 100vh;
-}
+.footer-logo { font-family: var(--font-display); font-size: 16px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+
+/* ══════════════════════════════════════
+   ONBOARDING
+══════════════════════════════════════ */
+#page-onboarding { background: var(--bg2); display: flex; flex-direction: column; min-height: 100vh; }
 .onb-header {
-  padding: 20px 40px;
+  padding: 18px 40px;
   display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border); background: var(--bg);
 }
-.onb-logo { font-family: var(--font-display); font-size: 20px; }
-.onb-logo span { color: var(--lime2); }
-.onb-progress { display: flex; gap: 6px; }
-.onb-dot {
-  height: 3px; width: 40px; border-radius: 2px;
-  background: var(--border2); transition: background .3s;
-}
-.onb-dot.done { background: var(--ink); }
- 
-.onb-body {
-  flex: 1; display: flex; align-items: flex-start; justify-content: center;
-  padding: 24px 20px 40px;
-  overflow-y: auto;
-}
+.onb-logo { font-family: var(--font-display); font-size: 18px; display: flex; align-items: center; gap: 6px; }
+.onb-progress { display: flex; gap: 5px; }
+.onb-dot { height: 3px; width: 36px; border-radius: 2px; background: var(--bg3); transition: background .25s; }
+.onb-dot.done { background: var(--accent); }
+.onb-body { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 32px 20px 48px; overflow-y: auto; }
 .onb-card {
-  background: var(--white); border: 1px solid var(--border);
-  border-radius: 20px; box-shadow: var(--shadow);
-  width: 100%; max-width: 560px; padding: 32px 28px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r-lg); box-shadow: var(--shadow);
+  width: 100%; max-width: 540px; padding: 32px 28px;
 }
-.onb-step-num {
-  font-size: 11px; font-family: var(--font-mono); font-weight: 500;
-  color: var(--ink3); text-transform: uppercase; letter-spacing: .08em;
-  margin-bottom: 10px;
-}
-.onb-q { font-family: var(--font-display); font-size: 26px; line-height: 1.25; margin-bottom: 6px; }
-.onb-hint { font-size: 14px; color: var(--ink3); margin-bottom: 28px; font-weight: 300; }
- 
-.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.onb-step-num { font-size: 10px; font-family: var(--font-mono); font-weight: 600; color: var(--ink3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+.onb-q { font-family: var(--font-display); font-size: 24px; line-height: 1.28; margin-bottom: 5px; }
+.onb-hint { font-size: 13px; color: var(--ink3); margin-bottom: 24px; font-weight: 300; }
+.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .choice {
-  padding: 16px 18px; border-radius: var(--r);
-  border: 1.5px solid var(--border2); background: var(--paper);
-  cursor: pointer; transition: all .15s; text-align: left;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  min-height: 72px;
+  padding: 14px 16px; border-radius: var(--r);
+  border: 1px solid var(--border2); background: var(--bg2);
+  cursor: pointer; transition: all .12s; text-align: left;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
 }
-.choice:hover { border-color: var(--ink2); background: var(--white); }
-.choice:active { transform: scale(.98); }
-.choice.selected { border-color: var(--ink); background: var(--white); box-shadow: 0 0 0 1px var(--ink); }
-.choice-title { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
-.choice-sub { font-size: 12px; color: var(--ink3); font-weight: 300; line-height: 1.4; }
- 
-.onb-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
- 
-/* PIANO PREVIEW (dopo generazione, prima del login) */
-.plan-preview {
-  max-width: 720px; margin: 0 auto; padding: 40px;
-}
-.plan-preview-header { text-align: center; margin-bottom: 32px; }
-.plan-preview-header h2 { font-family: var(--font-display); font-size: 36px; margin-bottom: 8px; }
-.plan-preview-header p { color: var(--ink2); font-size: 15px; font-weight: 300; }
- 
+.choice:hover { border-color: var(--ink3); background: var(--bg); }
+.choice.selected { border-color: var(--accent); background: #fef6f3; box-shadow: 0 0 0 1px var(--accent); }
+.choice-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.choice-sub { font-size: 11px; color: var(--ink3); font-weight: 300; line-height: 1.4; }
+.onb-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+
+.plan-preview { max-width: 700px; margin: 0 auto; padding: 32px 20px; }
+.plan-preview-header { text-align: center; margin-bottom: 28px; }
+.plan-preview-header h2 { font-family: var(--font-display); font-size: 32px; margin-bottom: 6px; }
+.plan-preview-header p { color: var(--ink2); font-size: 14px; font-weight: 300; }
+
 .save-banner {
-  background: var(--ink); color: var(--white);
-  border-radius: 16px; padding: 24px 28px;
+  background: var(--ink); color: #fff; border-radius: var(--r-lg); padding: 20px 24px;
   display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; margin-bottom: 28px;
+  gap: 14px; margin-bottom: 24px;
 }
-.save-banner-text h3 { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
-.save-banner-text p { font-size: 13px; color: rgba(255,255,255,.6); font-weight: 300; }
-.save-banner .btn-lime { flex-shrink: 0; }
- 
-.week-preview { display: flex; flex-direction: column; gap: 8px; }
+.save-banner-text h3 { font-size: 15px; font-weight: 500; margin-bottom: 3px; }
+.save-banner-text p { font-size: 12px; color: rgba(255,255,255,.5); font-weight: 300; }
+
+.week-preview { display: flex; flex-direction: column; gap: 6px; }
 .session-row {
-  background: var(--white); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 14px 18px;
-  display: flex; align-items: center; gap: 14px;
-  cursor: pointer; transition: border-color .15s;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: border-color .12s;
 }
-.session-row:hover { border-color: var(--border2); }
-.session-accent { width: 4px; height: 40px; border-radius: 2px; flex-shrink: 0; }
+.session-row:hover { border-color: var(--border2); background: var(--bg2); }
+.session-accent { width: 3px; height: 36px; border-radius: 2px; flex-shrink: 0; }
 .session-info { flex: 1; }
-.session-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
-.session-meta { font-size: 12px; color: var(--ink3); font-family: var(--font-mono); }
- 
-/* Streaming plan output */
+.session-name { font-size: 13px; font-weight: 500; margin-bottom: 1px; }
+.session-meta { font-size: 11px; color: var(--ink3); font-family: var(--font-mono); }
+
 .ai-output {
-  background: var(--white); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 20px;
-  font-size: 14px; color: var(--ink2); line-height: 1.7;
-  min-height: 120px; font-weight: 300;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 18px;
+  font-size: 13px; color: var(--ink2); line-height: 1.7;
+  min-height: 100px; font-weight: 300;
   white-space: pre-wrap; font-family: var(--font-mono);
 }
 .cursor-blink {
-  display: inline-block; width: 2px; height: 14px;
+  display: inline-block; width: 2px; height: 13px;
   background: var(--ink); margin-left: 2px;
   animation: blink .7s step-end infinite; vertical-align: middle;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
- 
-.spinner {
-  width: 20px; height: 20px; border-radius: 50%;
-  border: 2px solid var(--border2); border-top-color: var(--ink);
-  animation: spin .7s linear infinite; flex-shrink: 0;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
- 
-/* desktop: mobile nav nascosta */
+
+/* ══════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════ */
 .mobile-nav { display: none; }
-#page-app { display: flex; min-height: 100vh; background: var(--paper); }
- 
-/* SIDEBAR */
+#page-app { display: flex; min-height: 100vh; background: var(--bg2); }
+
 .sidebar {
-  width: 240px; min-height: 100vh;
-  background: var(--white); border-right: 1px solid var(--border);
+  width: 220px; min-height: 100vh;
+  background: var(--bg); border-right: 1px solid var(--border);
   position: fixed; top: 0; left: 0; z-index: 50;
-  display: flex; flex-direction: column;
-  transition: transform .3s;
+  display: flex; flex-direction: column; transition: transform .25s;
 }
 .sidebar-logo {
-  padding: 24px 24px 20px;
-  font-family: var(--font-display); font-size: 22px;
+  padding: 20px 20px 18px;
+  font-family: var(--font-display); font-size: 18px;
   border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 7px;
 }
-.sidebar-logo span { color: var(--lime2); }
- 
-.sidebar-nav { flex: 1; padding: 12px; }
+.sidebar-nav { flex: 1; padding: 10px 8px; }
 .nav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-radius: var(--r-sm);
-  cursor: pointer; color: var(--ink2); font-size: 14px; font-weight: 400;
-  transition: all .15s; margin-bottom: 2px; text-decoration: none;
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border-radius: var(--r-sm);
+  cursor: pointer; color: var(--ink2); font-size: 13px; font-weight: 400;
+  transition: all .12s; margin-bottom: 1px; text-decoration: none;
 }
-.nav-item:hover { background: var(--paper); color: var(--ink); }
-.nav-item.active { background: var(--paper2); color: var(--ink); font-weight: 500; }
-.nav-icon { width: 18px; text-align: center; font-size: 15px; }
- 
-.sidebar-bottom {
-  padding: 16px;
-  border-top: 1px solid var(--border);
-}
-.user-chip {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-radius: var(--r-sm);
-  background: var(--paper);
-}
+.nav-item:hover { background: var(--bg2); color: var(--ink); }
+.nav-item.active { background: var(--bg2); color: var(--ink); font-weight: 500; }
+.nav-icon { width: 16px; text-align: center; font-size: 14px; opacity: .7; }
+.nav-item.active .nav-icon { opacity: 1; }
+
+.sidebar-bottom { padding: 12px; border-top: 1px solid var(--border); }
+.user-chip { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--bg2); }
 .user-avatar {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--ink); color: var(--white);
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--ink); color: #fff;
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 500; flex-shrink: 0;
+  font-size: 11px; font-weight: 600; flex-shrink: 0;
 }
-.user-email { font-size: 12px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-.logout-btn {
-  background: none; border: none; cursor: pointer;
-  font-size: 16px; color: var(--ink3); transition: color .15s;
-}
+.user-email { font-size: 11px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.logout-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: var(--ink3); transition: color .12s; }
 .logout-btn:hover { color: var(--ink); }
- 
-/* MAIN CONTENT */
+
 .app-main {
-  margin-left: 240px; flex: 1; padding: 40px;
-  max-width: calc(100vw - 240px);
+  margin-left: 220px; flex: 1;
+  padding: 32px 36px;
+  max-width: calc(100vw - 220px);
+  min-height: 100vh;
 }
-.app-header { margin-bottom: 32px; }
-.app-title { font-family: var(--font-display); font-size: 32px; margin-bottom: 4px; }
-.app-sub { font-size: 13px; color: var(--ink3); font-family: var(--font-mono); }
- 
-/* Better touch targets throughout */
-button, .nav-item, .choice, .upcoming-item, .log-head,
-.program-session, .session-row, .cal-day {
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
- 
-/* app views */
+.app-header { margin-bottom: 24px; }
+.app-title { font-family: var(--font-display); font-size: 28px; margin-bottom: 3px; }
+.app-sub { font-size: 12px; color: var(--ink3); font-family: var(--font-mono); }
+
 .app-view { display: none; }
 .app-view.active { display: block; }
- 
+
 /* STATS */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
-.stat {
-  background: var(--white); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 18px 20px;
-}
-.stat-val { font-family: var(--font-display); font-size: 32px; margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: var(--ink3); font-family: var(--font-mono); }
- 
-/* GRID LAYOUT */
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.card {
-  background: var(--white); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 20px;
-}
-.card-title {
-  font-size: 11px; font-weight: 500; font-family: var(--font-mono);
-  text-transform: uppercase; letter-spacing: .08em;
-  color: var(--ink3); margin-bottom: 14px;
-}
- 
-/* UPCOMING LIST */
-.upcoming-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 0; border-bottom: 1px solid var(--border);
-  cursor: pointer;
-}
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+.stat { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 18px; }
+.stat-val { font-family: var(--font-display); font-size: 28px; margin-bottom: 3px; }
+.stat-label { font-size: 11px; color: var(--ink3); font-family: var(--font-mono); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; }
+.card-title { font-size: 10px; font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--ink3); margin-bottom: 14px; }
+
+.upcoming-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
 .upcoming-item:last-child { border-bottom: none; padding-bottom: 0; }
 .upcoming-item:first-child { padding-top: 0; }
-.uacc { width: 3px; height: 36px; border-radius: 2px; flex-shrink: 0; }
-.u-name { font-size: 13px; font-weight: 500; flex: 1; }
-.u-date { font-size: 11px; color: var(--ink3); font-family: var(--font-mono); }
- 
-/* LOG LIST */
-.log-item {
-  background: var(--white); border: 1px solid var(--border);
-  border-radius: var(--r); margin-bottom: 8px; overflow: hidden;
-}
-.log-head {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 18px; cursor: pointer; transition: background .1s;
-}
-.log-head:hover { background: var(--paper); }
-.log-acc { width: 3px; height: 40px; border-radius: 2px; flex-shrink: 0; }
+.uacc { width: 3px; height: 32px; border-radius: 2px; flex-shrink: 0; }
+.u-name { font-size: 12px; font-weight: 500; flex: 1; }
+.u-date { font-size: 10px; color: var(--ink3); font-family: var(--font-mono); }
+
+.log-item { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 6px; overflow: hidden; }
+.log-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; transition: background .1s; }
+.log-head:hover { background: var(--bg2); }
+.log-acc { width: 3px; height: 36px; border-radius: 2px; flex-shrink: 0; }
 .log-info { flex: 1; }
-.log-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
-.log-meta { font-size: 12px; color: var(--ink3); font-family: var(--font-mono); }
-.log-body { padding: 0 18px 14px 33px; display: none; border-top: 1px solid var(--border); }
+.log-title { font-size: 13px; font-weight: 500; margin-bottom: 1px; }
+.log-meta { font-size: 11px; color: var(--ink3); font-family: var(--font-mono); }
+.log-body { padding: 0 16px 12px 29px; display: none; border-top: 1px solid var(--border); }
 .log-body.open { display: block; }
-.log-note { font-size: 13px; color: var(--ink2); margin-top: 10px; font-style: italic; line-height: 1.6; }
- 
-/* PROGRAM VIEW */
-.program-week { margin-bottom: 24px; }
-.program-week-label {
-  font-size: 11px; font-family: var(--font-mono); font-weight: 500;
-  text-transform: uppercase; letter-spacing: .08em;
-  color: var(--ink3); margin-bottom: 8px;
-}
+.log-note { font-size: 12px; color: var(--ink2); margin-top: 9px; font-style: italic; line-height: 1.6; }
+
+.program-week { margin-bottom: 22px; }
+.program-week-label { font-size: 10px; font-family: var(--font-mono); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--ink3); margin-bottom: 6px; }
 .program-session {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 16px; border-radius: var(--r-sm);
-  background: var(--white); border: 1px solid var(--border);
-  margin-bottom: 6px; cursor: pointer; transition: border-color .15s;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: var(--r-sm);
+  background: var(--bg); border: 1px solid var(--border);
+  margin-bottom: 5px; cursor: pointer; transition: border-color .12s;
 }
-.program-session:hover { border-color: var(--border2); }
-.ps-day { font-size: 11px; color: var(--ink3); font-family: var(--font-mono); width: 70px; }
-.ps-name { font-size: 13px; font-weight: 500; flex: 1; }
-.ps-dur { font-size: 11px; color: var(--ink3); font-family: var(--font-mono); }
- 
-/* PROGRESS CHART */
-.bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
-.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.bar-bg { width: 100%; background: var(--paper2); border-radius: 4px; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
-.bar-fill { width: 100%; border-radius: 4px; background: var(--ink); transition: height .4s; }
-.bar-lbl { font-size: 10px; color: var(--ink3); font-family: var(--font-mono); }
- 
-/* STREAK */
-.streak-grid { display: flex; gap: 3px; flex-wrap: wrap; }
-.s-dot { width: 11px; height: 11px; border-radius: 2px; background: var(--paper2); }
-.s-dot.active { background: var(--ink); }
- 
-/* CALENDAR */
-.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
-.cal-dow { text-align: center; font-size: 10px; color: var(--ink3); font-family: var(--font-mono); padding: 4px 0; }
-.cal-day {
-  aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column;
-  align-items: center; justify-content: flex-start; padding: 4px 2px;
-  font-size: 11px; cursor: pointer; transition: background .1s; position: relative;
-}
-.cal-day:hover { background: var(--paper2); }
-.cal-day.today { background: var(--paper2); }
-.cal-day.today .cal-dnum { font-weight: 700; }
-.cal-day.other { color: var(--ink3); }
+.program-session:hover { border-color: var(--border2); background: var(--bg2); }
+.ps-day { font-size: 10px; color: var(--ink3); font-family: var(--font-mono); width: 64px; }
+.ps-name { font-size: 12px; font-weight: 500; flex: 1; }
+.ps-dur { font-size: 10px; color: var(--ink3); font-family: var(--font-mono); }
+
+.bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 90px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.bar-bg { width: 100%; background: var(--bg2); border-radius: 3px; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+.bar-fill { width: 100%; border-radius: 3px; background: var(--ink); transition: height .4s; }
+.bar-lbl { font-size: 9px; color: var(--ink3); font-family: var(--font-mono); }
+
+.streak-grid { display: flex; gap: 2px; flex-wrap: wrap; }
+.s-dot { width: 10px; height: 10px; border-radius: 2px; background: var(--bg3); }
+.s-dot.active { background: var(--accent); }
+
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-dow { text-align: center; font-size: 10px; color: var(--ink3); font-family: var(--font-mono); padding: 3px 0; }
+.cal-day { aspect-ratio: 1; border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 3px 2px; font-size: 10px; cursor: pointer; transition: background .1s; position: relative; }
+.cal-day:hover { background: var(--bg2); }
+.cal-day.today { background: var(--bg2); }
+.cal-day.today .cal-dnum { font-weight: 700; color: var(--accent); }
+.cal-day.other { color: var(--ink4); }
 .cal-dnum { line-height: 1; }
-.cal-ddot { width: 5px; height: 5px; border-radius: 50%; margin-top: 2px; }
- 
-/* EMPTY STATE */
-.empty {
-  text-align: center; padding: 48px 24px;
-  color: var(--ink3); font-size: 14px; font-weight: 300;
-}
-.empty-icon { font-size: 36px; margin-bottom: 12px; }
- 
-/* RATING STARS */
-.rating-row { display: flex; gap: 8px; }
+.cal-ddot { width: 4px; height: 4px; border-radius: 50%; margin-top: 2px; }
+
+.empty { text-align: center; padding: 40px 20px; color: var(--ink3); font-size: 13px; font-weight: 300; }
+.empty-icon { font-size: 28px; margin-bottom: 10px; }
+
+.rating-row { display: flex; gap: 6px; }
 .r-btn {
-  flex: 1; padding: 10px; border-radius: var(--r-sm);
-  border: 1.5px solid var(--border2); background: var(--paper);
-  cursor: pointer; font-family: var(--font-body); font-size: 13px;
-  transition: all .15s; font-weight: 400;
+  flex: 1; padding: 9px; border-radius: var(--r-sm);
+  border: 1px solid var(--border2); background: var(--bg2);
+  cursor: pointer; font-family: var(--font-body); font-size: 12px;
+  transition: all .12s; font-weight: 400;
 }
-.r-btn.sel { border-color: var(--ink); background: var(--white); font-weight: 500; }
- 
+.r-btn.sel { border-color: var(--accent); background: #fef6f3; font-weight: 500; }
+
+/* ══════════════════════════════════════
+   RACES / GARE
+══════════════════════════════════════ */
+.pr-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 24px; }
+.pr-card {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px;
+  transition: border-color .12s; cursor: pointer;
+}
+.pr-card:hover { border-color: var(--border2); }
+.pr-distance { font-size: 10px; font-family: var(--font-mono); font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--ink3); margin-bottom: 6px; }
+.pr-time { font-family: var(--font-display); font-size: 22px; color: var(--ink); margin-bottom: 3px; }
+.pr-time.empty-pr { font-size: 14px; color: var(--ink4); font-family: var(--font-body); font-style: italic; }
+.pr-date { font-size: 10px; color: var(--ink3); font-family: var(--font-mono); }
+
+.race-item {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px; margin-bottom: 6px;
+}
+.race-date-badge {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 6px 10px; text-align: center; flex-shrink: 0;
+  min-width: 48px;
+}
+.race-date-day { font-family: var(--font-display); font-size: 18px; line-height: 1; }
+.race-date-month { font-size: 9px; font-family: var(--font-mono); color: var(--ink3); text-transform: uppercase; letter-spacing: .06em; }
+.race-info { flex: 1; }
+.race-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.race-meta { font-size: 11px; color: var(--ink3); font-family: var(--font-mono); }
+.race-result { text-align: right; }
+.race-time { font-family: var(--font-display); font-size: 18px; }
+.race-pos { font-size: 10px; color: var(--ink3); font-family: var(--font-mono); }
+
 /* MOBILE */
 .hamburger {
-  display: none; position: fixed; top: 16px; left: 16px; z-index: 200;
-  width: 40px; height: 40px; background: var(--white); border: 1px solid var(--border);
+  display: none; position: fixed; top: 14px; left: 14px; z-index: 200;
+  width: 38px; height: 38px; background: var(--bg); border: 1px solid var(--border);
   border-radius: var(--r-sm); align-items: center; justify-content: center;
-  flex-direction: column; gap: 5px; padding: 10px; cursor: pointer;
-  box-shadow: var(--shadow);
+  flex-direction: column; gap: 4px; padding: 10px; cursor: pointer; box-shadow: var(--shadow);
 }
-.hamburger span { width: 18px; height: 1.5px; background: var(--ink); border-radius: 1px; }
- 
-/* overlay per chiudere sidebar su mobile */
+.hamburger span { width: 16px; height: 1.5px; background: var(--ink); border-radius: 1px; }
+
 .sidebar-overlay {
   display: none; position: fixed; inset: 0; z-index: 49;
-  background: rgba(26,25,22,.3); backdrop-filter: blur(2px);
+  background: rgba(26,26,24,.25); backdrop-filter: blur(2px);
 }
 .sidebar-overlay.open { display: block; }
- 
+
 @media (max-width: 900px) {
-  /* LANDING */
   .nav { padding: 12px 20px; }
-  .nav-logo { font-size: 20px; }
-  .btn-lg { padding: 14px 24px; font-size: 15px; }
+  .btn-lg { padding: 12px 22px; font-size: 14px; }
   .hero { padding: 48px 20px 40px; }
-  .hero-title { font-size: clamp(36px, 10vw, 56px); }
-  .hero-sub { font-size: 16px; }
   .hero-cta { flex-direction: column; align-items: stretch; }
   .hero-cta .btn { width: 100%; justify-content: center; }
-  .hero-visual { margin-top: 40px; }
-  .hvc-week { grid-template-columns: 1fr; gap: 8px; }
-  .hvc-accent { display: none; }
+  .hero-preview { margin-top: 36px; }
+  .hp-week { grid-template-columns: 1fr; gap: 7px; }
   .features { padding: 48px 20px; }
-  .features-grid { grid-template-columns: 1fr; gap: 16px; }
+  .features-grid { grid-template-columns: 1fr; gap: 0; }
   .how { padding: 48px 20px; }
-  .how-steps { grid-template-columns: 1fr; gap: 28px; }
-  .how-step::after { display: none; }
+  .how-steps { grid-template-columns: 1fr; gap: 24px; }
   .cta-section { padding: 60px 20px; }
-  .cta-section .btn { width: 100%; }
-  footer { padding: 24px 20px; flex-direction: column; gap: 6px; text-align: center; font-size: 12px; }
- 
-  /* ONBOARDING */
-  .onb-header { padding: 16px 20px; }
-  .onb-body { padding: 20px; align-items: flex-start; }
-  .onb-card { padding: 24px 20px; }
-  .onb-q { font-size: 22px; }
+  footer { padding: 20px; flex-direction: column; gap: 6px; text-align: center; }
+  .onb-header { padding: 14px 20px; }
+  .onb-body { padding: 20px; }
+  .onb-card { padding: 24px 18px; }
   .choice-grid { grid-template-columns: 1fr; }
   .plan-preview { padding: 20px; }
-  .save-banner { flex-direction: column; gap: 12px; }
+  .save-banner { flex-direction: column; gap: 10px; }
   .save-banner .btn { width: 100%; }
- 
-  /* APP */
   .sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
   .sidebar.open { transform: translateX(0); }
-  .app-main { margin-left: 0; max-width: 100vw; padding: 64px 16px 80px; }
-  .app-title { font-size: 24px; }
-  .app-header { margin-bottom: 20px; }
+  .app-main { margin-left: 0; max-width: 100vw; padding: 20px 16px 80px; }
   .hamburger { display: flex; }
   .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .stat { padding: 14px 16px; }
-  .stat-val { font-size: 26px; }
-  .two-col { grid-template-columns: 1fr; gap: 12px; }
-  .card { padding: 16px; }
- 
-  /* bottom nav mobile invece della sidebar */
+  .stat { padding: 12px 14px; }
+  .stat-val { font-size: 22px; }
+  .two-col { grid-template-columns: 1fr; gap: 10px; }
+  .card { padding: 14px; }
+  .pr-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   .mobile-nav {
     display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-    background: var(--white); border-top: 1px solid var(--border);
-    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+    background: var(--bg); border-top: 1px solid var(--border);
+    padding: 7px 0 calc(7px + env(safe-area-inset-bottom));
   }
   .mobile-nav-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 6px 4px; cursor: pointer; color: var(--ink3);
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 5px 3px; cursor: pointer; color: var(--ink3);
     font-size: 10px; font-family: var(--font-mono); border: none; background: none;
-    transition: color .15s;
+    transition: color .12s;
   }
-  .mobile-nav-item .mn-icon { font-size: 18px; line-height: 1; }
-  .mobile-nav-item.active { color: var(--ink); font-weight: 500; }
- 
-  /* modal full-screen su mobile */
-  .modal {
-    width: 100%; max-width: 100%; margin: 0;
-    border-radius: 20px 20px 0 0;
-    position: fixed; bottom: 0; left: 0; right: 0;
-    max-height: 92vh;
-  }
+  .mobile-nav-item .mn-icon { font-size: 16px; line-height: 1; }
+  .mobile-nav-item.active { color: var(--accent); font-weight: 500; }
+  .modal { width: 100%; max-width: 100%; border-radius: var(--r-lg) var(--r-lg) 0 0; position: fixed; bottom: 0; left: 0; right: 0; max-height: 90vh; }
   .modal-backdrop { align-items: flex-end; }
-  .modal-backdrop.open .modal { transform: translateY(0); }
- 
-  /* program view su mobile */
-  .ps-day { width: 50px; font-size: 10px; }
   .ps-dur { display: none; }
- 
-  /* calendario mobile */
-  .cal-day { font-size: 10px; }
 }
- 
-@media (max-width: 400px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .hero-eyebrow { font-size: 11px; }
-  .hvc-week { grid-template-columns: 1fr; }
-  .hvc-streak-row { display: none; }
-  .onb-card { padding: 24px 16px; border-radius: 16px; }
-  .choice-grid { gap: 8px; }
-  .choice { padding: 14px 14px; min-height: 64px; }
-  .modal-head { padding: 18px 20px 14px; }
-  .modal-body { padding: 16px 20px; }
-  .modal-footer { padding: 12px 20px 20px; }
-}
- 
-/* ANIMATIONS */
+
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.fade-up { animation: fadeUp .5s ease both; }
-.fade-up-2 { animation: fadeUp .5s ease .1s both; }
-.fade-up-3 { animation: fadeUp .5s ease .2s both; }
+.fade-up { animation: fadeUp .45s ease both; }
+.fade-up-2 { animation: fadeUp .45s ease .08s both; }
+.fade-up-3 { animation: fadeUp .45s ease .16s both; }
 </style>
 </head>
 <body>
- 
+
 <div id="toast"></div>
- 
-<!-- ══════════════════════════════════════════════════════
-     LANDING PAGE
-══════════════════════════════════════════════════════ -->
+
+<!-- ══════════════════════════════════════
+     LANDING
+══════════════════════════════════════ -->
 <div id="page-landing" class="page active">
- 
+
   <nav class="nav">
-    <a class="nav-logo" href="#">Run<span>Log</span></a>
+    <a class="nav-logo" href="#">
+      <span class="nav-logo-dot"></span>RunZip
+    </a>
     <div class="nav-actions">
       <button class="btn btn-ghost btn-sm" onclick="showLogin()">Accedi</button>
-      <button class="btn btn-primary btn-sm" onclick="goTo('onboarding')">Inizia gratis</button>
+      <button class="btn btn-accent btn-sm" onclick="goTo('onboarding')">Inizia gratis</button>
     </div>
   </nav>
- 
+
   <section class="hero">
-    <div class="hero-eyebrow fade-up">Piano personalizzato · Gratuito</div>
-    <h1 class="hero-title fade-up-2">
-      Corri meglio,<br><em>ogni settimana</em>
-    </h1>
-    <p class="hero-sub fade-up-3">
-      Rispondi a 5 domande sul tuo livello e i tuoi obiettivi. Il tuo piano di allenamento personale — fiato, resistenza, velocità, mobilità — è pronto in secondi.
-    </p>
+    <div class="hero-badge fade-up"><span class="hero-badge-dot"></span>Piano AI · Gratuito · Nessuna carta</div>
+    <h1 class="hero-title fade-up-2">Il tuo coach di corsa,<br><em>alimentato dall'AI</em></h1>
+    <p class="hero-sub fade-up-3">Rispondi a 5 domande. RunZip genera un piano personalizzato, traccia i tuoi allenamenti e segue i tuoi personal record — tutto gratis.</p>
     <div class="hero-cta fade-up-3">
-      <button class="btn btn-primary btn-lg" onclick="goTo('onboarding')">Crea il mio piano →</button>
+      <button class="btn btn-accent btn-lg" onclick="goTo('onboarding')">Crea il mio piano →</button>
       <button class="btn btn-ghost btn-lg" onclick="showLogin()">Ho già un account</button>
     </div>
- 
-    <div class="hero-visual fade-up-3" style="animation-delay:.3s">
-      <div class="hero-visual-bar">
-        <div class="wdot wdot-r"></div>
-        <div class="wdot wdot-y"></div>
-        <div class="wdot wdot-g"></div>
-        <span style="margin-left:8px;font-size:12px;color:var(--ink3);font-family:var(--font-mono)">runlog.app — settimana 3</span>
+
+    <div class="hero-preview fade-up-3" style="animation-delay:.22s">
+      <div class="hp-bar">
+        <div class="hp-dot" style="background:#ff6059"></div>
+        <div class="hp-dot" style="background:#ffbc2e"></div>
+        <div class="hp-dot" style="background:#28c941"></div>
+        <span style="margin-left:8px;font-size:11px;color:var(--ink3);font-family:var(--font-mono)">runzip.app — settimana 3 di 8</span>
       </div>
-      <div class="hero-visual-content">
-        <div class="hvc-week">
-        <div class="hvc-card">
-            <div class="hvc-accent" style="background:#4a9e2a"></div>
-            <div class="hvc-label">Lunedì</div>
-            <div class="hvc-name">Long run aerobico</div>
-            <div class="hvc-meta">40 min · zona 2</div>
+      <div class="hp-content">
+        <div class="hp-week">
+          <div class="hp-card">
+            <div class="hp-stripe" style="background:#2d9e5e"></div>
+            <div class="hp-card-top">Lunedì</div>
+            <div class="hp-card-name">Long run aerobico</div>
+            <div class="hp-card-meta">40 min · zona 2</div>
           </div>
-          <div class="hvc-card">
-            <div class="hvc-accent" style="background:#c87a18"></div>
-            <div class="hvc-label">Mercoledì</div>
-            <div class="hvc-name">Fartlek progressivo</div>
-            <div class="hvc-meta">45 min · 8×2min</div>
+          <div class="hp-card">
+            <div class="hp-stripe" style="background:#e8632a"></div>
+            <div class="hp-card-top">Mercoledì</div>
+            <div class="hp-card-name">Fartlek progressivo</div>
+            <div class="hp-card-meta">45 min · 8×2min</div>
           </div>
-          <div class="hvc-card">
-            <div class="hvc-accent" style="background:#6a48c8"></div>
-            <div class="hvc-label">Sabato</div>
-            <div class="hvc-name">Ripetute 400m</div>
-            <div class="hvc-meta">50 min · 8×400m</div>
-          </div>
-        </div>
-        <div class="hvc-streak-row" style="display:flex;align-items:center;gap:10px;padding:4px 0">
-          <span style="font-size:11px;color:var(--ink3);font-family:var(--font-mono)">Attività 4 settimane</span>
-          <div class="hvc-streak">
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--paper3)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--paper3)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--paper3)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--paper3)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--ink)"></div>
-            <div class="hvc-dot" style="background:var(--paper3)"></div>
+          <div class="hp-card">
+            <div class="hp-stripe" style="background:#7c5cbf"></div>
+            <div class="hp-card-top">Sabato</div>
+            <div class="hp-card-name">Ripetute 400m</div>
+            <div class="hp-card-meta">50 min · 8×400m</div>
           </div>
         </div>
       </div>
     </div>
   </section>
- 
+
   <section class="features">
-    <div class="section-label">Perché RunLog</div>
-    <h2 class="features-title">Un piano che ti conosce davvero</h2>
+    <div class="section-eyebrow">Perché RunZip</div>
+    <h2 class="section-title">Un piano che ti conosce davvero</h2>
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feature-icon">✦</div>
-        <div class="feature-title">Piano su misura</div>
-        <div class="feature-desc">Niente piani generici copiati da internet. Ogni sessione è costruita attorno al tuo livello, ai tuoi limiti e al tuo obiettivo.</div>
+        <span class="feature-icon">✦</span>
+        <div class="feature-title">Piano AI su misura</div>
+        <div class="feature-desc">Niente piani generici. Ogni sessione è costruita attorno al tuo livello, ai tuoi limiti e al tuo obiettivo.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">↗</div>
+        <span class="feature-icon">↗</span>
         <div class="feature-title">Progressione settimana per settimana</div>
-        <div class="feature-desc">Il volume cresce in modo graduale e sostenibile. Settimane di scarico ogni 4 per evitare infortuni e sovrallenamento.</div>
+        <div class="feature-desc">Volume graduale e sostenibile. Settimane di scarico ogni 4 per evitare infortuni e sovrallenamento.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">○</div>
-        <div class="feature-title">Log e progressi</div>
-        <div class="feature-desc">Registra ogni allenamento in 10 secondi. Traccia distanza, durata e sensazioni. Vedi i tuoi progressi nel tempo.</div>
+        <span class="feature-icon">○</span>
+        <div class="feature-title">Log allenamenti in 10 secondi</div>
+        <div class="feature-desc">Registra distanza, durata e sensazioni. Esporta le sessioni su Google Calendar, Apple o Outlook via .ics.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">◫</div>
+        <span class="feature-icon">🏅</span>
+        <div class="feature-title">Gare & Personal Record</div>
+        <div class="feature-desc">Tieni traccia dei tuoi PR per 5K, 10K, mezza e maratona. Registra ogni gara e guarda i progressi.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">◫</span>
         <div class="feature-title">Calendario integrato</div>
         <div class="feature-desc">Tutte le sessioni su calendario. Sai sempre cosa fare oggi, domani, questa settimana — senza doverci pensare.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">⌂</div>
-        <div class="feature-title">Zero attrezzi</div>
-        <div class="feature-desc">Pensato per chi corre all'aperto o a casa. Nessuna palestra necessaria. Solo scarpe e voglia di migliorare.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">◎</div>
+        <span class="feature-icon">◎</span>
         <div class="feature-title">Completamente gratuito</div>
-        <div class="feature-desc">Nessuna carta di credito, nessun abbonamento. Crea il tuo piano, allenati, traccia i risultati. Gratis per sempre.</div>
+        <div class="feature-desc">Nessuna carta di credito, nessun abbonamento. Crea il piano, allenati, traccia i risultati. Gratis per sempre.</div>
       </div>
     </div>
   </section>
- 
+
   <section class="how">
     <div class="how-inner">
-      <div class="section-label">Come funziona</div>
-      <h2 class="how-title">Dal divano al piano di allenamento<br>in 3 minuti</h2>
+      <div class="section-eyebrow">Come funziona</div>
+      <h2 class="how-title">Dal divano al piano<br>in 3 minuti</h2>
       <div class="how-steps">
         <div class="how-step">
-          <div class="how-num">01</div>
+          <div class="how-step-num">01</div>
           <div class="how-step-title">Rispondi a 5 domande</div>
-          <div class="how-step-desc">Livello attuale, limite principale, obiettivo, giorni disponibili e data di inizio. Niente di complicato.</div>
+          <div class="how-step-desc">Livello, limite principale, obiettivo, giorni disponibili e data di inizio. Niente di complicato.</div>
         </div>
         <div class="how-step">
-          <div class="how-num">02</div>
-          <div class="how-step-title">Il tuo piano prende forma</div>
-          <div class="how-step-desc">In pochi secondi ottieni un piano di 6–8 settimane con sessioni dettagliate, progressioni e settimane di scarico.</div>
+          <div class="how-step-num">02</div>
+          <div class="how-step-title">Il piano prende forma</div>
+          <div class="how-step-desc">In pochi secondi hai un piano di 6–8 settimane con sessioni dettagliate, progressioni e scarichi.</div>
         </div>
         <div class="how-step">
-          <div class="how-num">03</div>
+          <div class="how-step-num">03</div>
           <div class="how-step-title">Allenati e traccia</div>
-          <div class="how-step-desc">Segui il piano, registra ogni sessione, guarda i progressi crescere settimana dopo settimana.</div>
+          <div class="how-step-desc">Segui il piano, registra ogni sessione, tieni i PR. Guarda i progressi crescere ogni settimana.</div>
         </div>
       </div>
     </div>
   </section>
- 
+
   <section class="cta-section">
     <h2>Inizia oggi.<br>Gratis, per sempre.</h2>
     <p>Nessuna carta di credito. Nessun abbonamento. Solo tu e il tuo piano.</p>
-    <button class="btn btn-primary btn-lg" onclick="goTo('onboarding')">Crea il mio piano →</button>
+    <button class="btn btn-accent btn-lg" onclick="goTo('onboarding')">Crea il mio piano →</button>
   </section>
- 
+
   <footer>
-    <span class="footer-logo">Run<span>Log</span></span>
-    <span>© 2025 RunLog · Fatto con ♥ in Italia</span>
+    <span class="footer-logo"><span class="nav-logo-dot"></span>RunZip</span>
+    <span>© 2025 RunZip · Fatto con ♥ in Italia</span>
     <span>Gratuito per sempre</span>
   </footer>
 </div>
- 
-<!-- ══════════════════════════════════════════════════════
+
+<!-- ══════════════════════════════════════
      ONBOARDING
-══════════════════════════════════════════════════════ -->
+══════════════════════════════════════ -->
 <div id="page-onboarding" class="page">
   <div class="onb-header">
-    <div class="onb-logo">Run<span>Log</span></div>
+    <div class="onb-logo"><span class="nav-logo-dot"></span>RunZip</div>
     <div class="onb-progress" id="onb-progress"></div>
   </div>
   <div class="onb-body" id="onb-body"></div>
 </div>
- 
-<!-- ══════════════════════════════════════════════════════
+
+<!-- ══════════════════════════════════════
      APP
-══════════════════════════════════════════════════════ -->
+══════════════════════════════════════ -->
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
- 
+
 <div id="page-app" class="page">
- 
   <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
     <span></span><span></span><span></span>
   </div>
- 
+
   <div class="sidebar" id="sidebar">
-    <div class="sidebar-logo">Run<span>Log</span></div>
+    <div class="sidebar-logo"><span class="nav-logo-dot"></span>RunZip</div>
     <nav class="sidebar-nav">
-      <a class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
-        <span class="nav-icon">⌂</span> Dashboard
-      </a>
-      <a class="nav-item" data-view="calendar" onclick="switchView('calendar')">
-        <span class="nav-icon">◫</span> Calendario
-      </a>
-      <a class="nav-item" data-view="log" onclick="switchView('log')">
-        <span class="nav-icon">✓</span> Allenamenti
-      </a>
-      <a class="nav-item" data-view="progress" onclick="switchView('progress')">
-        <span class="nav-icon">↗</span> Progressi
-      </a>
-      <a class="nav-item" data-view="program" onclick="switchView('program')">
-        <span class="nav-icon">✦</span> Programma
-      </a>
+      <a class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')"><span class="nav-icon">⌂</span>Dashboard</a>
+      <a class="nav-item" data-view="calendar" onclick="switchView('calendar')"><span class="nav-icon">◫</span>Calendario</a>
+      <a class="nav-item" data-view="log" onclick="switchView('log')"><span class="nav-icon">✓</span>Allenamenti</a>
+      <a class="nav-item" data-view="races" onclick="switchView('races')"><span class="nav-icon">🏅</span>Gare & PR</a>
+      <a class="nav-item" data-view="progress" onclick="switchView('progress')"><span class="nav-icon">↗</span>Progressi</a>
+      <a class="nav-item" data-view="program" onclick="switchView('program')"><span class="nav-icon">✦</span>Programma</a>
     </nav>
     <div class="sidebar-bottom">
       <div class="user-chip">
@@ -937,9 +758,9 @@ button, .nav-item, .choice, .upcoming-item, .log-head,
       </div>
     </div>
   </div>
- 
+
   <div class="app-main">
- 
+
     <!-- DASHBOARD -->
     <div class="app-view active" id="view-dashboard">
       <div class="app-header">
@@ -963,36 +784,49 @@ button, .nav-item, .choice, .upcoming-item, .log-head,
         </div>
       </div>
     </div>
- 
+
     <!-- CALENDAR -->
     <div class="app-view" id="view-calendar">
       <div class="app-header" style="display:flex;align-items:center;justify-content:space-between">
         <div><div class="app-title">Calendario</div><div class="app-sub">sessioni pianificate e completate</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="exportICS()">⬇ Esporta .ics</button>
       </div>
-      <div class="card" style="margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">‹</button>
-          <div style="flex:1;font-size:16px;font-weight:500;text-align:center" id="cal-label">—</div>
+          <div style="flex:1;font-size:15px;font-weight:500;text-align:center" id="cal-label">—</div>
           <button class="btn btn-ghost btn-sm" onclick="calNav(1)">›</button>
         </div>
         <div class="cal-grid" id="cal-grid"></div>
       </div>
       <div id="cal-detail"></div>
     </div>
- 
+
     <!-- LOG -->
     <div class="app-view" id="view-log">
       <div class="app-header" style="display:flex;align-items:center;justify-content:space-between">
         <div><div class="app-title">Allenamenti</div><div class="app-sub">storico completo</div></div>
-        <button class="btn btn-primary btn-sm" onclick="openLogModal()">+ Aggiungi</button>
+        <button class="btn btn-accent btn-sm" onclick="openLogModal()">+ Aggiungi</button>
       </div>
       <div id="log-list"><div class="empty"><div class="empty-icon">○</div>Nessun allenamento registrato</div></div>
     </div>
- 
+
+    <!-- RACES -->
+    <div class="app-view" id="view-races">
+      <div class="app-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div><div class="app-title">Gare & PR</div><div class="app-sub">personal record e gare disputate</div></div>
+        <button class="btn btn-accent btn-sm" onclick="openRaceModal()">+ Aggiungi gara</button>
+      </div>
+      <div style="margin-bottom:8px;font-size:10px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)">Personal Record</div>
+      <div class="pr-grid" id="pr-grid"></div>
+      <div style="margin-bottom:8px;margin-top:4px;font-size:10px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)">Storico Gare</div>
+      <div id="race-list"><div class="empty"><div class="empty-icon">🏅</div>Nessuna gara registrata</div></div>
+    </div>
+
     <!-- PROGRESS -->
     <div class="app-view" id="view-progress">
       <div class="app-header"><div class="app-title">Progressi</div><div class="app-sub">andamento nel tempo</div></div>
-      <div class="two-col" style="margin-bottom:16px">
+      <div class="two-col" style="margin-bottom:14px">
         <div class="card">
           <div class="card-title">Allenamenti per settimana</div>
           <div class="bar-chart" id="bar-chart"></div>
@@ -1007,52 +841,45 @@ button, .nav-item, .choice, .upcoming-item, .log-head,
         <div class="streak-grid" id="streak-grid"></div>
       </div>
     </div>
- 
+
     <!-- PROGRAM -->
     <div class="app-view" id="view-program">
       <div class="app-header" style="display:flex;align-items:center;justify-content:space-between">
         <div><div class="app-title">Programma</div><div class="app-sub" id="prog-sub">il tuo piano personale</div></div>
-        <button class="btn btn-ghost btn-sm" onclick="goTo('onboarding')">↺ Rigenera</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="exportICS()">⬇ .ics</button>
+          <button class="btn btn-ghost btn-sm" onclick="goTo('onboarding')">↺ Rigenera</button>
+        </div>
       </div>
       <div id="program-content">
-        <div class="empty"><div class="empty-icon">✦</div>Nessun programma<br><br><button class="btn btn-primary" onclick="goTo('onboarding')">Genera programma</button></div>
+        <div class="empty"><div class="empty-icon">✦</div>Nessun programma<br><br><button class="btn btn-accent" onclick="goTo('onboarding')">Genera programma</button></div>
       </div>
     </div>
- 
+
   </div>
- 
-  <!-- MOBILE BOTTOM NAV -->
+
   <nav class="mobile-nav" id="mobile-nav" style="display:none">
-    <button class="mobile-nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
-      <span class="mn-icon">⌂</span>Home
-    </button>
-    <button class="mobile-nav-item" data-view="calendar" onclick="switchView('calendar')">
-      <span class="mn-icon">◫</span>Calendario
-    </button>
-    <button class="mobile-nav-item" data-view="log" onclick="switchView('log')">
-      <span class="mn-icon">✓</span>Log
-    </button>
-    <button class="mobile-nav-item" data-view="progress" onclick="switchView('progress')">
-      <span class="mn-icon">↗</span>Progressi
-    </button>
-    <button class="mobile-nav-item" data-view="program" onclick="switchView('program')">
-      <span class="mn-icon">✦</span>Piano
-    </button>
+    <button class="mobile-nav-item active" data-view="dashboard" onclick="switchView('dashboard')"><span class="mn-icon">⌂</span>Home</button>
+    <button class="mobile-nav-item" data-view="calendar" onclick="switchView('calendar')"><span class="mn-icon">◫</span>Cal.</button>
+    <button class="mobile-nav-item" data-view="log" onclick="switchView('log')"><span class="mn-icon">✓</span>Log</button>
+    <button class="mobile-nav-item" data-view="races" onclick="switchView('races')"><span class="mn-icon">🏅</span>Gare</button>
+    <button class="mobile-nav-item" data-view="program" onclick="switchView('program')"><span class="mn-icon">✦</span>Piano</button>
   </nav>
- 
 </div>
+
+<!-- AUTH MODAL -->
 <div class="modal-backdrop" id="auth-modal">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title" id="auth-modal-title">Accedi a RunLog</div>
+      <div class="modal-title" id="auth-modal-title">Accedi a RunZip</div>
       <button class="modal-close" onclick="closeModal('auth-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <div id="auth-tabs" style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border)">
-        <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:10px;background:none;border:none;font-family:var(--font-body);font-size:14px;cursor:pointer;font-weight:500;border-bottom:2px solid var(--ink);margin-bottom:-1px">Accedi</button>
-        <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')" style="flex:1;padding:10px;background:none;border:none;font-family:var(--font-body);font-size:14px;cursor:pointer;color:var(--ink2);border-bottom:2px solid transparent;margin-bottom:-1px">Registrati</button>
+      <div id="auth-tabs" style="display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid var(--border)">
+        <button class="auth-tab" id="tab-login" onclick="switchAuthTab('login')" style="flex:1;padding:9px;background:none;border:none;font-family:var(--font-body);font-size:13px;cursor:pointer;font-weight:500;border-bottom:2px solid var(--ink);margin-bottom:-1px;color:var(--ink)">Accedi</button>
+        <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')" style="flex:1;padding:9px;background:none;border:none;font-family:var(--font-body);font-size:13px;cursor:pointer;color:var(--ink2);border-bottom:2px solid transparent;margin-bottom:-1px">Registrati</button>
       </div>
-      <div id="auth-note" style="background:var(--paper);border-radius:var(--r-sm);padding:12px 14px;font-size:13px;color:var(--ink2);margin-bottom:16px;display:none;font-weight:300">
+      <div id="auth-note" style="background:var(--bg2);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--ink2);margin-bottom:14px;display:none;font-weight:300">
         Registrati per salvare il tuo piano e i tuoi progressi su tutti i dispositivi.
       </div>
       <div class="form-group">
@@ -1067,19 +894,19 @@ button, .nav-item, .choice, .upcoming-item, .log-head,
         <label class="form-label">Conferma password</label>
         <input type="password" class="form-input" id="auth-confirm" placeholder="••••••••">
       </div>
-      <div id="auth-error" style="color:#c0392b;font-size:13px;margin-bottom:8px;display:none"></div>
+      <div id="auth-error" style="color:#c0392b;font-size:12px;margin-bottom:6px;display:none;padding:8px 10px;background:#fdf0ee;border-radius:var(--r-sm)"></div>
     </div>
-    <div class="modal-footer" style="flex-direction:column;gap:10px">
-      <button class="btn btn-primary" style="width:100%" onclick="submitAuth()" id="auth-submit-btn">Accedi</button>
+    <div class="modal-footer" style="flex-direction:column;gap:8px">
+      <button class="btn btn-accent" style="width:100%" onclick="submitAuth()" id="auth-submit-btn">Accedi</button>
       <button class="btn btn-ghost" style="width:100%" onclick="submitGoogleAuth()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Continua con Google
       </button>
     </div>
   </div>
 </div>
- 
-<!-- ══ MODAL: LOG ══ -->
+
+<!-- LOG MODAL -->
 <div class="modal-backdrop" id="log-modal">
   <div class="modal">
     <div class="modal-head">
@@ -1094,14 +921,14 @@ button, .nav-item, .choice, .upcoming-item, .log-head,
       <div class="form-group">
         <label class="form-label">Tipo sessione</label>
         <select class="form-select" id="log-type">
-          <option value="aerobico">A — Aerobico (Long run)</option>
-          <option value="ritmo">B — Ritmo (Fartlek / Soglia)</option>
-          <option value="velocita">C — Velocità (Ripetute)</option>
+          <option value="aerobico">Aerobico (Long run)</option>
+          <option value="ritmo">Ritmo (Fartlek / Soglia)</option>
+          <option value="velocita">Velocità (Ripetute)</option>
           <option value="mobilita">Mobilità</option>
           <option value="altro">Altro</option>
         </select>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="form-group">
           <label class="form-label">Durata (min)</label>
           <input type="number" class="form-input" id="log-duration" placeholder="45" min="1" max="300">
@@ -1126,12 +953,12 @@ button, .nav-item, .choice, .upcoming-item, .log-head,
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('log-modal')">Annulla</button>
-      <button class="btn btn-primary" onclick="saveLog()">Salva</button>
+      <button class="btn btn-accent" onclick="saveLog()">Salva</button>
     </div>
   </div>
 </div>
- 
-<!-- ══ MODAL: SESSION DETAIL ══ -->
+
+<!-- SESSION MODAL -->
 <div class="modal-backdrop" id="session-modal">
   <div class="modal">
     <div class="modal-head">
@@ -1141,111 +968,198 @@ button, .nav-item, .choice, .upcoming-item, .log-head,
     <div class="modal-body" id="sm-body"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('session-modal')">Chiudi</button>
-      <button class="btn btn-primary" onclick="logFromSession()">+ Registra</button>
+      <button class="btn btn-accent" onclick="logFromSession()">+ Registra</button>
     </div>
   </div>
 </div>
- 
+
+<!-- RACE MODAL -->
+<div class="modal-backdrop" id="race-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="race-modal-title">Aggiungi gara</div>
+      <button class="modal-close" onclick="closeModal('race-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome gara</label>
+        <input type="text" class="form-input" id="race-name" placeholder="es. Maratona di Roma">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input type="date" class="form-input" id="race-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Distanza</label>
+          <select class="form-select" id="race-distance">
+            <option value="5K">5K</option>
+            <option value="10K">10K</option>
+            <option value="21K">Mezza maratona</option>
+            <option value="42K">Maratona</option>
+            <option value="custom">Altra distanza</option>
+          </select>
+        </div>
+      </div>
+      <div id="race-custom-wrap" class="form-group" style="display:none">
+        <label class="form-label">Distanza personalizzata (km)</label>
+        <input type="number" class="form-input" id="race-custom-dist" placeholder="es. 15" step="0.1">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div class="form-group">
+          <label class="form-label">Ore</label>
+          <input type="number" class="form-input" id="race-h" placeholder="0" min="0" max="23">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Minuti</label>
+          <input type="number" class="form-input" id="race-m" placeholder="45" min="0" max="59">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Secondi</label>
+          <input type="number" class="form-input" id="race-s" placeholder="30" min="0" max="59">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Note</label>
+        <input type="text" class="form-input" id="race-notes" placeholder="Posizione, meteo, considerazioni...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('race-modal')">Annulla</button>
+      <button class="btn btn-accent" onclick="saveRace()">Salva gara</button>
+    </div>
+  </div>
+</div>
+
+<!-- PR EDIT MODAL -->
+<div class="modal-backdrop" id="pr-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="pr-modal-title">Aggiorna PR</div>
+      <button class="modal-close" onclick="closeModal('pr-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div class="form-group">
+          <label class="form-label">Ore</label>
+          <input type="number" class="form-input" id="pr-h" placeholder="0" min="0" max="23">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Minuti</label>
+          <input type="number" class="form-input" id="pr-m" placeholder="22" min="0" max="59">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Secondi</label>
+          <input type="number" class="form-input" id="pr-s" placeholder="30" min="0" max="59">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Data del PR</label>
+        <input type="date" class="form-input" id="pr-date">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('pr-modal')">Annulla</button>
+      <button class="btn btn-accent" onclick="savePR()">Salva PR</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ══════════════════════════════════════════════════════
-// CONFIG — sostituisci con le tue credenziali Supabase
-// ══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
 const SUPABASE_URL  = 'https://sjgxshrrjmigxfeccpox.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_ZhF4uGKjb6KUqCGCDVy86g_rblCh_UM';
 const CLAUDE_API    = '/.netlify/functions/generate-plan';
- 
-// Inizializza Supabase (se configurato)
+
 let sb = null;
 try {
   if (!SUPABASE_URL.startsWith('INSERISCI')) {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
   }
 } catch(e) {}
- 
-// ══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════
 // STATE
-// ══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 let currentUser = null;
 let userProgram = null;
 let userLogs    = [];
+let userRaces   = [];
+let userPRs     = { '5K': null, '10K': null, '21K': null, '42K': null };
 let onbStep     = 0;
 let onbAnswers  = {};
 let logRating   = null;
 let currentSession = null;
 let calDate     = new Date();
-let pendingPlan = null; // piano generato prima del login
+let pendingPlan = null;
 let authMode    = 'login';
- 
+let editingPRKey = null;
+
 const STEPS = [
-  {
-    id: 'level', q: 'Qual è il tuo livello attuale?', hint: 'Sii onesto — il piano si adatta a te',
+  { id: 'level', q: 'Qual è il tuo livello attuale?', hint: 'Sii onesto — il piano si adatta a te',
     choices: [
-      { val: 'base',      title: 'Base',      sub: 'meno di 20 min continui' },
-      { val: 'medio',     title: 'Medio',     sub: '20–35 min senza fermarmi' },
-      { val: 'avanzato',  title: 'Avanzato',  sub: '35+ min, voglio struttura' },
+      { val: 'base',     title: 'Base',     sub: 'meno di 20 min continui' },
+      { val: 'medio',    title: 'Medio',    sub: '20–35 min senza fermarmi' },
+      { val: 'avanzato', title: 'Avanzato', sub: '35+ min, voglio struttura' },
     ]
   },
-  {
-    id: 'limit', q: 'Dove senti il limite principale?', hint: 'Cosa ti ferma prima?',
+  { id: 'limit', q: 'Dove senti il limite principale?', hint: 'Cosa ti ferma prima?',
     choices: [
-      { val: 'fiato',    title: 'Fiato / cardio',  sub: 'finisco il respiro' },
-      { val: 'gambe',    title: 'Gambe',            sub: 'cedono prima del fiato' },
-      { val: 'ritmo',    title: 'Ritmo lento',      sub: 'voglio essere più veloce' },
-      { val: 'mobilita', title: 'Rigidità',          sub: 'muscoli e articolazioni' },
+      { val: 'fiato',    title: 'Fiato / cardio', sub: 'finisco il respiro' },
+      { val: 'gambe',    title: 'Gambe',           sub: 'cedono prima del fiato' },
+      { val: 'ritmo',    title: 'Ritmo lento',     sub: 'voglio essere più veloce' },
+      { val: 'mobilita', title: 'Rigidità',         sub: 'muscoli e articolazioni' },
     ]
   },
-  {
-    id: 'goal', q: 'Qual è il tuo obiettivo?', hint: 'Definisce la struttura del piano',
+  { id: 'goal', q: 'Qual è il tuo obiettivo?', hint: 'Definisce la struttura del piano',
     choices: [
-      { val: '5k',         title: '5K veloce',       sub: 'sotto i 25 min' },
-      { val: '10k',        title: '10K',             sub: 'prima o seconda volta' },
-      { val: 'fitness',    title: 'Fitness',          sub: 'stare meglio, correre di più' },
-      { val: 'resistenza', title: 'Resistenza',       sub: 'correre più a lungo' },
+      { val: '5k',         title: '5K veloce',   sub: 'sotto i 25 min' },
+      { val: '10k',        title: '10K',         sub: 'prima o seconda volta' },
+      { val: 'fitness',    title: 'Fitness',      sub: 'stare meglio, correre di più' },
+      { val: 'resistenza', title: 'Resistenza',   sub: 'correre più a lungo' },
     ]
   },
-  {
-    id: 'days', q: 'Giorni disponibili a settimana?', hint: 'Solo corsa, mobilità a parte',
+  { id: 'days', q: 'Giorni disponibili a settimana?', hint: 'Solo corsa, mobilità a parte',
     choices: [
       { val: '3', title: '3 giorni', sub: 'es. lun · mer · sab' },
       { val: '4', title: '4 giorni', sub: 'es. lun · mer · ven · dom' },
       { val: '5', title: '5 giorni', sub: 'alto volume' },
     ]
   },
-  {
-    id: 'start', q: 'Da quando vuoi iniziare?', hint: 'Le sessioni verranno distribuite a partire da questa data',
-    type: 'date'
-  },
+  { id: 'start', q: 'Da quando vuoi iniziare?', hint: 'Le sessioni verranno distribuite a partire da questa data', type: 'date' },
 ];
- 
+
 const TYPE_META = {
-  aerobico: { label: 'Aerobico', color: '#4a9e2a', tag: 'tag-aerobico' },
-  ritmo:    { label: 'Ritmo',    color: '#c87a18', tag: 'tag-ritmo' },
-  velocita: { label: 'Velocità', color: '#6a48c8', tag: 'tag-velocita' },
+  aerobico: { label: 'Aerobico', color: '#2d9e5e', tag: 'tag-aerobico' },
+  ritmo:    { label: 'Ritmo',    color: '#e8632a', tag: 'tag-ritmo' },
+  velocita: { label: 'Velocità', color: '#7c5cbf', tag: 'tag-velocita' },
   mobilita: { label: 'Mobilità', color: '#0a8a7a', tag: 'tag-mobilita' },
-  altro:    { label: 'Altro',    color: '#9a9690', tag: '' },
+  altro:    { label: 'Altro',    color: '#9a9a96', tag: '' },
 };
- 
-// ══════════════════════════════════════════════════════
-// PAGE ROUTER
-// ══════════════════════════════════════════════════════
+
+const PR_LABELS = { '5K': '5 Km', '10K': '10 Km', '21K': 'Mezza', '42K': 'Maratona' };
+
+// ═══════════════════════════════════════
+// ROUTER
+// ═══════════════════════════════════════
 function goTo(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   window.scrollTo(0,0);
-  // mostra/nascondi mobile nav
   const mobileNav = document.getElementById('mobile-nav');
   if (mobileNav) mobileNav.style.display = page === 'app' && window.innerWidth < 900 ? 'flex' : 'none';
   if (page === 'onboarding') initOnboarding();
   if (page === 'app') {
     renderDashboard();
     renderProgram();
-    if (window.innerWidth < 900 && mobileNav) mobileNav.style.display = 'flex';
   }
 }
- 
-// ══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════
 // AUTH
-// ══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 function showLogin(mode) {
   authMode = mode || 'login';
   switchAuthTab(authMode);
@@ -1255,45 +1169,53 @@ function showLogin(mode) {
   }
   openModal('auth-modal');
 }
- 
+
 function switchAuthTab(tab) {
   authMode = tab;
-  document.getElementById('tab-login').style.borderBottomColor = tab === 'login' ? 'var(--ink)' : 'transparent';
-  document.getElementById('tab-login').style.color = tab === 'login' ? 'var(--ink)' : 'var(--ink2)';
-  document.getElementById('tab-register').style.borderBottomColor = tab === 'register' ? 'var(--ink)' : 'transparent';
-  document.getElementById('tab-register').style.color = tab === 'register' ? 'var(--ink)' : 'var(--ink2)';
-  document.getElementById('auth-modal-title').textContent = tab === 'login' ? 'Accedi a RunLog' : 'Crea il tuo account';
-  document.getElementById('auth-submit-btn').textContent = tab === 'login' ? 'Accedi' : 'Registrati';
+  const loginTab = document.getElementById('tab-login');
+  const regTab   = document.getElementById('tab-register');
+  loginTab.style.borderBottomColor = tab === 'login' ? 'var(--ink)' : 'transparent';
+  loginTab.style.color = tab === 'login' ? 'var(--ink)' : 'var(--ink2)';
+  regTab.style.borderBottomColor = tab === 'register' ? 'var(--ink)' : 'transparent';
+  regTab.style.color = tab === 'register' ? 'var(--ink)' : 'var(--ink2)';
+  document.getElementById('auth-modal-title').textContent = tab === 'login' ? 'Accedi a RunZip' : 'Crea il tuo account';
+  document.getElementById('auth-submit-btn').textContent  = tab === 'login' ? 'Accedi' : 'Registrati';
   document.getElementById('auth-confirm-wrap').style.display = tab === 'register' ? 'block' : 'none';
   document.getElementById('auth-error').style.display = 'none';
 }
- 
+
 async function submitAuth() {
   const email = document.getElementById('auth-email').value.trim();
   const pass  = document.getElementById('auth-password').value;
-  const errEl = document.getElementById('auth-error');
-  errEl.style.display = 'none';
- 
+  document.getElementById('auth-error').style.display = 'none';
   if (!email || !pass) { showError('auth-error', 'Inserisci email e password.'); return; }
- 
+
+  const btn = document.getElementById('auth-submit-btn');
+  const orig = btn.textContent;
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
   if (!sb) {
-    // Demo mode senza Supabase
     currentUser = { id: 'demo', email };
     closeModal('auth-modal');
-    afterLogin();
+    await afterLogin();
     return;
   }
- 
+
   try {
     let res;
     if (authMode === 'register') {
       const confirm = document.getElementById('auth-confirm').value;
-      if (pass !== confirm) { showError('auth-error', 'Le password non coincidono.'); return; }
+      if (pass !== confirm) {
+        btn.textContent = orig; btn.disabled = false;
+        showError('auth-error', 'Le password non coincidono.'); return;
+      }
       res = await sb.auth.signUp({ email, password: pass });
       if (res.error) throw res.error;
       if (!res.data.session) {
-        toast('Controlla la tua email per confermare l\'account!');
         closeModal('auth-modal');
+        btn.textContent = orig; btn.disabled = false;
+        toast('Controlla la tua email per confermare!');
         return;
       }
     } else {
@@ -1302,17 +1224,20 @@ async function submitAuth() {
     }
     currentUser = res.data.user;
     closeModal('auth-modal');
-    afterLogin();
+    btn.textContent = orig; btn.disabled = false;
+    toast(authMode === 'register' ? '✓ Benvenuto in RunZip!' : '✓ Bentornato!');
+    await afterLogin();
   } catch(e) {
+    btn.textContent = orig; btn.disabled = false;
     showError('auth-error', e.message || 'Errore di autenticazione.');
   }
 }
- 
+
 async function submitGoogleAuth() {
-  if (!sb) { toast('Configura Supabase per usare Google OAuth'); return; }
+  if (!sb) { toast('Supabase non configurato'); return; }
   await sb.auth.signInWithOAuth({ provider: 'google' });
 }
- 
+
 async function afterLogin() {
   setUserUI();
   await loadUserData();
@@ -1322,48 +1247,53 @@ async function afterLogin() {
     toast('Piano salvato!');
   }
   goTo('app');
+  setTimeout(() => switchView('program'), 80);
 }
- 
+
 async function logout() {
   if (sb) await sb.auth.signOut();
-  currentUser = null; userProgram = null; userLogs = [];
+  currentUser = null; userProgram = null; userLogs = []; userRaces = [];
+  userPRs = { '5K': null, '10K': null, '21K': null, '42K': null };
   goTo('landing');
 }
- 
+
 function setUserUI() {
   if (!currentUser) return;
   const email = currentUser.email || '';
   document.getElementById('user-email').textContent = email;
   document.getElementById('user-avatar').textContent = email[0]?.toUpperCase() || '?';
 }
- 
+
 function showError(id, msg) {
   const el = document.getElementById(id);
   el.textContent = msg; el.style.display = 'block';
 }
- 
-// ══════════════════════════════════════════════════════
-// DATA (Supabase o localStorage fallback)
-// ══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
 const LS = {
-  get: (k,d) => { try { return JSON.parse(localStorage.getItem('rl2_'+k)) ?? d; } catch { return d; } },
-  set: (k,v) => localStorage.setItem('rl2_'+k, JSON.stringify(v)),
+  get: (k,d) => { try { return JSON.parse(localStorage.getItem('rz_'+k)) ?? d; } catch { return d; } },
+  set: (k,v) => localStorage.setItem('rz_'+k, JSON.stringify(v)),
 };
- 
+
 async function loadUserData() {
   if (sb && currentUser) {
-    // Carica programma
     const { data: pd } = await sb.from('programs').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(1);
     userProgram = pd?.[0]?.data || null;
-    // Carica log
     const { data: ld } = await sb.from('logs').select('*').eq('user_id', currentUser.id).order('date', { ascending: false });
     userLogs = ld || [];
+    // Load races from localStorage for now (no separate table needed)
+    userRaces = LS.get('races_' + currentUser.id, []);
+    userPRs   = LS.get('prs_'   + currentUser.id, { '5K': null, '10K': null, '21K': null, '42K': null });
   } else {
     userProgram = LS.get('program', null);
     userLogs    = LS.get('logs', []);
+    userRaces   = LS.get('races', []);
+    userPRs     = LS.get('prs', { '5K': null, '10K': null, '21K': null, '42K': null });
   }
 }
- 
+
 async function saveLog_backend(log) {
   if (sb && currentUser) {
     await sb.from('logs').insert({ user_id: currentUser.id, ...log });
@@ -1372,7 +1302,7 @@ async function saveLog_backend(log) {
     LS.set('logs', userLogs);
   }
 }
- 
+
 async function deleteLog_backend(id) {
   if (sb && currentUser) {
     await sb.from('logs').delete().eq('id', id);
@@ -1381,7 +1311,7 @@ async function deleteLog_backend(id) {
     LS.set('logs', userLogs);
   }
 }
- 
+
 async function savePlanToBackend(plan) {
   userProgram = plan;
   if (sb && currentUser) {
@@ -1390,59 +1320,61 @@ async function savePlanToBackend(plan) {
     LS.set('program', plan);
   }
 }
- 
-// ══════════════════════════════════════════════════════
+
+function saveRacesLocal() {
+  const key = currentUser ? 'races_' + currentUser.id : 'races';
+  LS.set(key, userRaces);
+}
+
+function savePRsLocal() {
+  const key = currentUser ? 'prs_' + currentUser.id : 'prs';
+  LS.set(key, userPRs);
+}
+
+// ═══════════════════════════════════════
 // ONBOARDING
-// ══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 function initOnboarding() {
   onbStep = 0; onbAnswers = {};
   renderOnbStep();
 }
- 
+
 function renderOnbStep() {
-  const steps = STEPS;
-  const s = steps[onbStep];
- 
-  // progress dots
-  document.getElementById('onb-progress').innerHTML = steps.map((_, i) =>
-    `<div class="onb-dot${i <= onbStep ? ' done' : ''}"></div>`).join('');
- 
-  let html = `
-    <div class="onb-card fade-up">
-      <div class="onb-step-num">${onbStep + 1} di ${steps.length}</div>
-      <div class="onb-q">${s.q}</div>
-      <div class="onb-hint">${s.hint || ''}</div>`;
- 
+  const s = STEPS[onbStep];
+  document.getElementById('onb-progress').innerHTML =
+    STEPS.map((_,i) => `<div class="onb-dot${i <= onbStep ? ' done' : ''}"></div>`).join('');
+
+  let html = `<div class="onb-card fade-up">
+    <div class="onb-step-num">${onbStep + 1} di ${STEPS.length}</div>
+    <div class="onb-q">${s.q}</div>
+    <div class="onb-hint">${s.hint || ''}</div>`;
+
   if (!s.type) {
-    html += `<div class="choice-grid">
-      ${s.choices.map(c => `
-        <div class="choice${onbAnswers[s.id] === c.val ? ' selected' : ''}" onclick="selectOnb('${s.id}','${c.val}',this)">
-          <div class="choice-title">${c.title}</div>
-          <div class="choice-sub">${c.sub}</div>
-        </div>`).join('')}
-    </div>`;
+    html += `<div class="choice-grid">${s.choices.map(c => `
+      <div class="choice${onbAnswers[s.id] === c.val ? ' selected' : ''}" onclick="selectOnb('${s.id}','${c.val}',this)">
+        <div class="choice-title">${c.title}</div>
+        <div class="choice-sub">${c.sub}</div>
+      </div>`).join('')}</div>`;
   } else if (s.type === 'date') {
-    html += `<input type="date" class="form-input" id="onb-date" value="${today()}" style="font-size:16px;padding:14px">`;
+    html += `<input type="date" class="form-input" id="onb-date" value="${today()}" style="font-size:16px;padding:13px">`;
   }
- 
-  html += `
-    <div class="onb-actions">
-      ${onbStep > 0 ? `<button class="btn btn-ghost" onclick="onbNav(-1)">← Indietro</button>` : '<div></div>'}
-      <button class="btn btn-primary" onclick="onbNav(1)">
-        ${onbStep < steps.length - 1 ? 'Avanti →' : 'Genera il mio piano ✦'}
-      </button>
-    </div>
-    </div>`;
- 
+
+  html += `<div class="onb-actions">
+    ${onbStep > 0 ? `<button class="btn btn-ghost" onclick="onbNav(-1)">← Indietro</button>` : '<div></div>'}
+    <button class="btn btn-accent" onclick="onbNav(1)">
+      ${onbStep < STEPS.length - 1 ? 'Avanti →' : 'Genera il mio piano ✦'}
+    </button>
+  </div></div>`;
+
   document.getElementById('onb-body').innerHTML = html;
 }
- 
+
 function selectOnb(id, val, el) {
   onbAnswers[id] = val;
   el.closest('.choice-grid').querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
 }
- 
+
 function onbNav(dir) {
   const s = STEPS[onbStep];
   if (dir === 1) {
@@ -1457,63 +1389,49 @@ function onbNav(dir) {
   if (onbStep >= STEPS.length) { generatePlan(); return; }
   renderOnbStep();
 }
- 
-// ══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════
 // AI PLAN GENERATION
-// ══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 async function generatePlan() {
-  document.getElementById('onb-progress').innerHTML = STEPS.map(() => `<div class="onb-dot done"></div>`).join('');
- 
+  document.getElementById('onb-progress').innerHTML =
+    STEPS.map(() => `<div class="onb-dot done"></div>`).join('');
+
   document.getElementById('onb-body').innerHTML = `
-    <div class="onb-card fade-up" style="max-width:560px">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-        <div class="spinner"></div>
+    <div class="onb-card fade-up" style="max-width:540px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+        <div class="spinner spinner-dark"></div>
         <div>
-          <div style="font-size:16px;font-weight:500;margin-bottom:2px">Stiamo costruendo il tuo piano...</div>
-          <div style="font-size:13px;color:var(--ink3);font-weight:300">Analizziamo le tue risposte</div>
+          <div style="font-size:15px;font-weight:500;margin-bottom:2px">Costruendo il tuo piano...</div>
+          <div style="font-size:12px;color:var(--ink3);font-weight:300">Analizziamo le tue risposte</div>
         </div>
       </div>
       <div class="ai-output" id="ai-out">Il tuo piano personalizzato sta per arrivare...<span class="cursor-blink"></span></div>
     </div>`;
- 
-  const prompt = `Sei RunLog, un coach di corsa AI. Crea un piano personalizzato in JSON per questo atleta:
- 
+
+  const prompt = `Sei RunZip, un coach di corsa AI. Crea un piano personalizzato in JSON per questo atleta:
+
 - Livello: ${onbAnswers.level}
-- Limite principale: ${onbAnswers.limit}  
+- Limite principale: ${onbAnswers.limit}
 - Obiettivo: ${onbAnswers.goal}
 - Giorni/settimana: ${onbAnswers.days}
 - Data inizio: ${onbAnswers.start}
- 
+
 Genera un piano di 6-8 settimane. ${onbAnswers.days} sessioni/settimana partendo da ${onbAnswers.start}. Distribuisci le sessioni in giorni non consecutivi (es. lun/mer/sab per 3gg).
- 
+
 RISPONDI SOLO CON JSON VALIDO. Nessun testo extra, nessun markdown.
- 
-{
-  "weeks": [
-    {
-      "weekNum": 1,
-      "focus": "breve focus (max 4 parole)",
-      "sessions": [
-        {
-          "date": "YYYY-MM-DD",
-          "name": "Nome sessione",
-          "type": "aerobico|ritmo|velocita|mobilita",
-          "duration": "X min",
-          "description": "Obiettivo sessione in una frase",
-          "blocks": ["blocco 1", "blocco 2", "blocco 3"]
-        }
-      ]
-    }
-  ]
-}
- 
+
+{"weeks":[{"weekNum":1,"focus":"breve focus max 4 parole","sessions":[{"date":"YYYY-MM-DD","name":"Nome sessione","type":"aerobico|ritmo|velocita|mobilita","duration":"X min","description":"Obiettivo in una frase breve","blocks":["blocco 1","blocco 2"]}]}]}
+
 Regole:
 - Tipi validi: aerobico, ritmo, velocita, mobilita
 - Ogni settimana = esattamente ${onbAnswers.days} sessioni
 - Settimana 4 e ultima = deload (volume -30%)
 - Progressione realistica per livello ${onbAnswers.level}
-- Blocks: massimo 2 elementi brevi per sessione, max 15 parole ciascuno`;
- 
+- Blocks: massimo 2 elementi per sessione, max 12 parole ciascuno
+- name: max 4 parole
+- description: max 15 parole`;
+
   try {
     const res = await fetch(CLAUDE_API, {
       method: 'POST',
@@ -1524,97 +1442,87 @@ Regole:
         messages: [{ role: 'user', content: prompt }]
       })
     });
- 
+
     const data = await res.json();
-    console.log('Claude response:', JSON.stringify(data));
     const text = data.content?.map(c => c.text || '').join('') || '';
     const clean = text.replace(/```json|```/g, '').trim();
     const plan = JSON.parse(clean);
     plan.generatedAt = today();
     plan.answers = { ...onbAnswers };
- 
     pendingPlan = plan;
     showPlanPreview(plan);
- 
+
   } catch(e) {
     document.getElementById('onb-body').innerHTML = `
       <div class="onb-card">
-        <div style="color:#c0392b;margin-bottom:16px">Errore nella generazione: ${e.message}</div>
-        <button class="btn btn-primary" onclick="generatePlan()">↺ Riprova</button>
+        <div style="color:#c0392b;margin-bottom:14px;font-size:13px">Errore nella generazione: ${e.message}</div>
+        <button class="btn btn-accent" onclick="generatePlan()">↺ Riprova</button>
       </div>`;
   }
 }
- 
+
 function showPlanPreview(plan) {
   const isLoggedIn = !!currentUser;
   const weeks = plan.weeks || [];
- 
-  let sessionsHtml = '';
   const firstWeek = weeks[0];
+  let sessionsHtml = '';
   if (firstWeek) {
     firstWeek.sessions.forEach(s => {
       const m = TYPE_META[s.type] || TYPE_META.altro;
       const d = new Date(s.date + 'T12:00:00');
       const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-      sessionsHtml += `
-        <div class="session-row" onclick="openSessionModal(${encodeSession(s)})">
-          <div class="session-accent" style="background:${m.color}"></div>
-          <div class="session-info">
-            <div class="session-name">${s.name}</div>
-            <div class="session-meta">${days[d.getDay()]} ${d.getDate()} · ${s.duration || '—'}</div>
-          </div>
-          <span class="tag ${m.tag}">${m.label}</span>
-        </div>`;
+      sessionsHtml += `<div class="session-row" onclick="openSessionModal(${encodeSession(s)})">
+        <div class="session-accent" style="background:${m.color}"></div>
+        <div class="session-info">
+          <div class="session-name">${s.name}</div>
+          <div class="session-meta">${days[d.getDay()]} ${d.getDate()} · ${s.duration || '—'}</div>
+        </div>
+        <span class="tag ${m.tag}">${m.label}</span>
+      </div>`;
     });
   }
- 
+
   document.getElementById('onb-body').innerHTML = `
     <div class="plan-preview fade-up">
       <div class="plan-preview-header">
         <h2>Il tuo piano è pronto ✦</h2>
         <p>${weeks.length} settimane · ${onbAnswers.days} sessioni/settimana · inizia ${formatDate(onbAnswers.start)}</p>
       </div>
- 
-      ${!isLoggedIn ? `
-      <div class="save-banner">
+      ${!isLoggedIn ? `<div class="save-banner">
         <div class="save-banner-text">
           <h3>Salva il tuo piano</h3>
           <p>Crea un account gratuito per non perderlo e tracciare i progressi</p>
         </div>
-        <button class="btn btn-lime" onclick="showLogin('register')">Registrati gratis →</button>
+        <button class="btn btn-accent" onclick="showLogin('register')">Registrati gratis →</button>
       </div>` : ''}
- 
-      <div style="font-size:11px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:10px">
+      <div style="font-size:10px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:8px">
         Settimana 1 — ${firstWeek?.focus || ''}
       </div>
       <div class="week-preview">${sessionsHtml}</div>
- 
-      ${weeks.length > 1 ? `
-      <div style="margin-top:20px;padding:16px;background:var(--white);border:1px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--ink3);font-weight:300">
-        + altre ${weeks.length - 1} settimane nel piano completo
-        ${isLoggedIn ? '' : ' — <strong>registrati per vederle tutte</strong>'}
+      ${weeks.length > 1 ? `<div style="margin-top:16px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);font-size:12px;color:var(--ink3);font-weight:300">
+        + altre ${weeks.length - 1} settimane nel piano completo${isLoggedIn ? '' : ' — <strong style="color:var(--ink2)">registrati per vederle tutte</strong>'}
       </div>` : ''}
- 
-      <div style="display:flex;gap:10px;margin-top:24px;justify-content:center">
+      <div style="display:flex;gap:8px;margin-top:20px;justify-content:center">
         ${isLoggedIn
-          ? `<button class="btn btn-primary btn-lg" onclick="savePlanAndGo()">Vai alla dashboard →</button>`
+          ? `<button class="btn btn-accent btn-lg" onclick="savePlanAndGo()">Vai al programma →</button>`
           : `<button class="btn btn-ghost" onclick="goTo('landing')">← Torna alla home</button>
-             <button class="btn btn-primary btn-lg" onclick="showLogin('register')">Salva e inizia →</button>`}
+             <button class="btn btn-accent btn-lg" onclick="showLogin('register')">Salva e inizia →</button>`}
       </div>
     </div>`;
 }
- 
+
 async function savePlanAndGo() {
   if (pendingPlan) {
     await savePlanToBackend(pendingPlan);
     pendingPlan = null;
   }
   goTo('app');
+  setTimeout(() => switchView('program'), 80);
 }
- 
-// ══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════
 // APP VIEWS
-// ══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 function switchView(v) {
   document.querySelectorAll('.app-view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -1627,42 +1535,33 @@ function switchView(v) {
   if (v === 'progress') renderProgress();
   if (v === 'program') renderProgram();
   if (v === 'calendar') renderCalendar();
+  if (v === 'races') renderRaces();
   if (window.innerWidth < 900) {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-overlay').classList.remove('open');
   }
 }
- 
+
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sidebar-overlay').classList.toggle('open');
 }
- 
+
 // DASHBOARD
 function renderDashboard() {
   document.getElementById('dash-date').textContent =
     new Date().toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
- 
-  const greet = (() => {
-    const h = new Date().getHours();
-    if (h < 12) return 'Buongiorno';
-    if (h < 18) return 'Buon pomeriggio';
-    return 'Buonasera';
-  })();
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Buongiorno' : h < 18 ? 'Buon pomeriggio' : 'Buonasera';
   const name = currentUser?.email?.split('@')[0] || '';
   document.getElementById('dash-greeting').textContent = `${greet}${name ? ', ' + name : ''}!`;
- 
-  const thisWeekLogs = userLogs.filter(l => {
-    const d = new Date(l.date);
-    const now = new Date();
-    const mon = new Date(now); mon.setDate(now.getDate() - (now.getDay()||7) + 1); mon.setHours(0,0,0,0);
-    return d >= mon;
-  });
- 
-  document.getElementById('s-total').textContent = userLogs.length;
-  document.getElementById('s-week').textContent  = thisWeekLogs.length;
+
+  const mon = new Date(); mon.setDate(mon.getDate() - (mon.getDay()||7) + 1); mon.setHours(0,0,0,0);
+  const thisWeek = userLogs.filter(l => new Date(l.date) >= mon);
+  document.getElementById('s-total').textContent  = userLogs.length;
+  document.getElementById('s-week').textContent   = thisWeek.length;
   document.getElementById('s-streak').textContent = calcStreak();
- 
+
   if (userProgram) {
     const total = userProgram.weeks.reduce((a,w) => a + w.sessions.length, 0);
     const done  = new Set(userLogs.map(l => l.date));
@@ -1670,11 +1569,10 @@ function renderDashboard() {
     userProgram.weeks.forEach(w => w.sessions.forEach(s => { if (done.has(s.date)) completed++; }));
     document.getElementById('s-comp').textContent = Math.round(completed/total*100) + '%';
   }
- 
   renderUpcoming();
   renderWeekDash();
 }
- 
+
 function renderUpcoming() {
   const el = document.getElementById('upcoming-list');
   if (!userProgram) return;
@@ -1686,11 +1584,11 @@ function renderUpcoming() {
   }));
   upcoming.sort((a,b) => a.date.localeCompare(b.date));
   const next = upcoming.slice(0, 4);
-  if (!next.length) { el.innerHTML = '<div class="empty" style="padding:20px 0">Nessuna sessione in programma</div>'; return; }
+  if (!next.length) { el.innerHTML = '<div class="empty" style="padding:16px 0">Tutto completato! 🎉</div>'; return; }
   el.innerHTML = next.map(s => {
     const m = TYPE_META[s.type] || TYPE_META.altro;
     const diff = daysDiff(s.date);
-    const dl   = diff === 0 ? 'Oggi' : diff === 1 ? 'Domani' : `Fra ${diff}g`;
+    const dl = diff === 0 ? 'Oggi' : diff === 1 ? 'Domani' : `Fra ${diff}g`;
     return `<div class="upcoming-item" onclick="openSessionModal(${encodeSession(s)})">
       <div class="uacc" style="background:${m.color}"></div>
       <div class="u-name">${s.name}</div>
@@ -1698,7 +1596,7 @@ function renderUpcoming() {
     </div>`;
   }).join('');
 }
- 
+
 function renderWeekDash() {
   const el = document.getElementById('week-dash');
   if (!userProgram) { el.innerHTML = ''; return; }
@@ -1712,7 +1610,7 @@ function renderWeekDash() {
   }));
   const done = new Set(userLogs.map(l => l.date));
   const daysName = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-  if (!weekS.length) { el.innerHTML = '<div style="color:var(--ink3);font-size:13px;font-weight:300">Nessuna sessione questa settimana</div>'; return; }
+  if (!weekS.length) { el.innerHTML = '<div style="color:var(--ink3);font-size:12px;font-weight:300">Nessuna sessione questa settimana</div>'; return; }
   el.innerHTML = weekS.map(s => {
     const m = TYPE_META[s.type] || TYPE_META.altro;
     const d = new Date(s.date);
@@ -1724,59 +1622,49 @@ function renderWeekDash() {
     </div>`;
   }).join('');
 }
- 
+
 // CALENDAR
 function renderCalendar() {
   const y = calDate.getFullYear(), m = calDate.getMonth();
   document.getElementById('cal-label').textContent =
-    new Date(y, m, 1).toLocaleDateString('it-IT', { month:'long', year:'numeric' });
- 
-  const first = new Date(y, m, 1);
-  const last  = new Date(y, m+1, 0);
+    new Date(y,m,1).toLocaleDateString('it-IT', { month:'long', year:'numeric' });
+  const first = new Date(y,m,1), last = new Date(y,m+1,0);
   let startDay = first.getDay() - 1; if (startDay < 0) startDay = 6;
- 
   const todayStr = today();
   const done = new Set(userLogs.map(l => l.date));
   const planned = {};
   if (userProgram) userProgram.weeks.forEach(w => w.sessions.forEach(s => { planned[s.date] = s; }));
- 
   const dows = ['L','M','M','G','V','S','D'];
   let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
- 
   for (let i = 0; i < startDay; i++) {
-    const d = new Date(y, m, -startDay + i + 1);
+    const d = new Date(y,m,-startDay+i+1);
     html += `<div class="cal-day other"><div class="cal-dnum">${d.getDate()}</div></div>`;
   }
- 
   for (let d = 1; d <= last.getDate(); d++) {
-    const ds = dateStr(new Date(y, m, d));
+    const ds = dateStr(new Date(y,m,d));
     const isToday = ds === todayStr;
-    const isDone  = done.has(ds);
-    const isPlan  = planned[ds];
+    const isDone = done.has(ds), isPlan = planned[ds];
     let dot = '';
-    if (isDone) dot = `<div class="cal-ddot" style="background:#4a9e2a"></div>`;
-    else if (isPlan) dot = `<div class="cal-ddot" style="background:${TYPE_META[isPlan.type]?.color||'#9a9690'}"></div>`;
+    if (isDone) dot = `<div class="cal-ddot" style="background:var(--green)"></div>`;
+    else if (isPlan) dot = `<div class="cal-ddot" style="background:${TYPE_META[isPlan.type]?.color||'#9a9a96'}"></div>`;
     html += `<div class="cal-day${isToday?' today':''}" onclick="calDayClick('${ds}')">
       <div class="cal-dnum">${d}</div>${dot}</div>`;
   }
- 
   document.getElementById('cal-grid').innerHTML = html;
   document.getElementById('cal-detail').innerHTML = '';
 }
- 
+
 function calNav(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); }
- 
+
 function calDayClick(ds) {
   const planned = {};
   if (userProgram) userProgram.weeks.forEach(w => w.sessions.forEach(s => { planned[s.date] = s; }));
   const dayLogs = userLogs.filter(l => l.date === ds);
   const plan = planned[ds];
- 
-  let html = `<div class="card"><div style="font-size:15px;font-weight:500;margin-bottom:14px">${formatDate(ds)}</div>`;
+  let html = `<div class="card"><div style="font-size:14px;font-weight:500;margin-bottom:12px">${formatDate(ds)}</div>`;
   if (plan) {
     const m = TYPE_META[plan.type] || TYPE_META.altro;
-    html += `<div style="margin-bottom:12px">
-      <div class="card-title">Pianificato</div>
+    html += `<div style="margin-bottom:10px"><div class="card-title">Pianificato</div>
       <div class="program-session" onclick="openSessionModal(${encodeSession(plan)})">
         <div class="ps-name">${plan.name}</div>
         <div class="ps-dur">${plan.duration||''}</div>
@@ -1793,12 +1681,48 @@ function calDayClick(ds) {
         <span class="tag tag-done">✓</span></div>`;
     });
   }
-  if (!plan && !dayLogs.length) html += `<div style="color:var(--ink3);font-size:13px;font-weight:300">Nessuna attività</div>`;
-  html += `<div style="margin-top:12px"><button class="btn btn-ghost btn-sm" onclick="openLogModal('${ds}')">+ Aggiungi log</button></div></div>`;
- 
+  if (!plan && !dayLogs.length) html += `<div style="color:var(--ink3);font-size:12px;font-weight:300">Nessuna attività</div>`;
+  html += `<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="openLogModal('${ds}')">+ Aggiungi log</button></div></div>`;
   document.getElementById('cal-detail').innerHTML = html;
 }
- 
+
+// ICS EXPORT
+function exportICS() {
+  if (!userProgram) { toast('Nessun programma da esportare'); return; }
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//RunZip//RunZip//IT',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:RunZip — Piano di allenamento',
+    'X-WR-TIMEZONE:Europe/Rome',
+  ];
+  userProgram.weeks.forEach(w => {
+    w.sessions.forEach(s => {
+      const d = s.date.replace(/-/g,'');
+      const uid = `runzip-${s.date}-${s.type}@runzip.app`;
+      const desc = s.description || '';
+      const blocks = s.blocks?.join(' | ') || '';
+      lines.push('BEGIN:VEVENT');
+      lines.push(`DTSTART;VALUE=DATE:${d}`);
+      lines.push(`DTEND;VALUE=DATE:${d}`);
+      lines.push(`SUMMARY:🏃 ${s.name} (${s.duration||''})`);
+      lines.push(`DESCRIPTION:${desc}${blocks ? '\\n' + blocks : ''}`);
+      lines.push(`CATEGORIES:RunZip,${s.type}`);
+      lines.push(`UID:${uid}`);
+      lines.push('END:VEVENT');
+    });
+  });
+  lines.push('END:VCALENDAR');
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'runzip-piano.ics';
+  a.click(); URL.revokeObjectURL(url);
+  toast('Piano esportato! Aprilo per importarlo nel calendario.');
+}
+
 // LOG
 function renderLog() {
   const el = document.getElementById('log-list');
@@ -1806,7 +1730,7 @@ function renderLog() {
     el.innerHTML = '<div class="empty"><div class="empty-icon">○</div>Nessun allenamento registrato</div>';
     return;
   }
-  el.innerHTML = userLogs.map((l, i) => {
+  el.innerHTML = userLogs.map((l) => {
     const m = TYPE_META[l.type] || TYPE_META.altro;
     const emoji = l.rating === 3 ? ' 🔥' : l.rating === 1 ? ' 😤' : '';
     return `<div class="log-item">
@@ -1820,36 +1744,183 @@ function renderLog() {
       </div>
       <div class="log-body">
         ${l.notes ? `<div class="log-note">"${l.notes}"</div>` : ''}
-        <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--ink3);font-family:var(--font-mono)">
-          ${l.duration ? `<span>Durata: <strong style="color:var(--ink)">${l.duration} min</strong></span>` : ''}
-          ${l.distance ? `<span>Distanza: <strong style="color:var(--ink)">${l.distance} km</strong></span>` : ''}
+        <div style="display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--ink3);font-family:var(--font-mono)">
+          ${l.duration ? `<span>Durata: <strong style="color:var(--ink)">${l.duration}min</strong></span>` : ''}
+          ${l.distance ? `<span>Distanza: <strong style="color:var(--ink)">${l.distance}km</strong></span>` : ''}
           ${l.rating   ? `<span>Sensazione: <strong style="color:var(--ink)">${['','Dura','Ok','Ottima'][l.rating]}</strong></span>` : ''}
         </div>
-        <div style="margin-top:10px">
-          <button class="btn btn-ghost btn-sm" style="color:#c0392b;border-color:rgba(192,57,43,.3)" onclick="doDeleteLog('${l.id}')">Elimina</button>
+        <div style="margin-top:8px">
+          <button class="btn btn-ghost btn-sm" style="color:#c0392b;border-color:rgba(192,57,43,.25)" onclick="doDeleteLog('${l.id}')">Elimina</button>
         </div>
       </div>
     </div>`;
   }).join('');
 }
- 
+
 async function doDeleteLog(id) {
   if (!confirm('Eliminare questo allenamento?')) return;
   await deleteLog_backend(id);
   await loadUserData();
   renderLog(); renderDashboard(); renderProgress();
 }
- 
+
+// RACES & PR
+function renderRaces() {
+  renderPRGrid();
+  renderRaceList();
+}
+
+function renderPRGrid() {
+  const el = document.getElementById('pr-grid');
+  el.innerHTML = Object.entries(PR_LABELS).map(([key, label]) => {
+    const pr = userPRs[key];
+    return `<div class="pr-card" onclick="openPRModal('${key}')">
+      <div class="pr-distance">${label}</div>
+      ${pr
+        ? `<div class="pr-time">${pr.time}</div><div class="pr-date">${formatDate(pr.date)}</div>`
+        : `<div class="pr-time empty-pr">Imposta PR</div><div class="pr-date">—</div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function renderRaceList() {
+  const el = document.getElementById('race-list');
+  if (!userRaces.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🏅</div>Nessuna gara registrata</div>';
+    return;
+  }
+  const sorted = [...userRaces].sort((a,b) => b.date.localeCompare(a.date));
+  el.innerHTML = sorted.map(r => {
+    const d = new Date(r.date + 'T12:00:00');
+    const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+    return `<div class="race-item">
+      <div class="race-date-badge">
+        <div class="race-date-day">${d.getDate()}</div>
+        <div class="race-date-month">${months[d.getMonth()]}</div>
+      </div>
+      <div class="race-info">
+        <div class="race-name">${r.name}</div>
+        <div class="race-meta">${r.distance}${r.notes ? ' · ' + r.notes : ''}</div>
+      </div>
+      <div class="race-result">
+        <div class="race-time">${r.time || '—'}</div>
+        <div style="margin-top:4px"><button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px;color:#c0392b;border-color:rgba(192,57,43,.25)" onclick="deleteRace('${r.id}')">✕</button></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openPRModal(key) {
+  editingPRKey = key;
+  document.getElementById('pr-modal-title').textContent = `PR ${PR_LABELS[key]}`;
+  const pr = userPRs[key];
+  if (pr) {
+    const parts = pr.time.split(':');
+    document.getElementById('pr-h').value = parts.length === 3 ? parts[0] : '0';
+    document.getElementById('pr-m').value = parts.length === 3 ? parts[1] : parts[0];
+    document.getElementById('pr-s').value = parts.length === 3 ? parts[2] : parts[1];
+    document.getElementById('pr-date').value = pr.date;
+  } else {
+    document.getElementById('pr-h').value = '';
+    document.getElementById('pr-m').value = '';
+    document.getElementById('pr-s').value = '';
+    document.getElementById('pr-date').value = today();
+  }
+  openModal('pr-modal');
+}
+
+function savePR() {
+  if (!editingPRKey) return;
+  const h = parseInt(document.getElementById('pr-h').value) || 0;
+  const m = parseInt(document.getElementById('pr-m').value) || 0;
+  const s = parseInt(document.getElementById('pr-s').value) || 0;
+  const date = document.getElementById('pr-date').value;
+  if (!m && !h) { toast('Inserisci almeno minuti e secondi'); return; }
+  const time = h > 0
+    ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  userPRs[editingPRKey] = { time, date: date || today() };
+  savePRsLocal();
+  closeModal('pr-modal');
+  renderPRGrid();
+  toast('PR aggiornato! 🏅');
+}
+
+function openRaceModal() {
+  document.getElementById('race-name').value = '';
+  document.getElementById('race-date').value = today();
+  document.getElementById('race-h').value = '';
+  document.getElementById('race-m').value = '';
+  document.getElementById('race-s').value = '';
+  document.getElementById('race-notes').value = '';
+  document.getElementById('race-distance').value = '10K';
+  document.getElementById('race-custom-wrap').style.display = 'none';
+  document.getElementById('race-distance').onchange = function() {
+    document.getElementById('race-custom-wrap').style.display = this.value === 'custom' ? 'block' : 'none';
+  };
+  openModal('race-modal');
+}
+
+function saveRace() {
+  const name = document.getElementById('race-name').value.trim();
+  const date = document.getElementById('race-date').value;
+  let distance = document.getElementById('race-distance').value;
+  if (distance === 'custom') distance = document.getElementById('race-custom-dist').value + 'km';
+  const h = parseInt(document.getElementById('race-h').value) || 0;
+  const m = parseInt(document.getElementById('race-m').value) || 0;
+  const s = parseInt(document.getElementById('race-s').value) || 0;
+  const notes = document.getElementById('race-notes').value.trim();
+  if (!name || !date) { toast('Inserisci nome e data'); return; }
+  const time = (h || m || s)
+    ? (h > 0 ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+             : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`)
+    : '';
+  const race = { id: Date.now().toString(), name, date, distance, time, notes };
+  userRaces.unshift(race);
+  saveRacesLocal();
+
+  // Auto-aggiorna PR se è una distanza standard
+  const prKey = { '5K':'5K', '10K':'10K', '21K':'21K', '42K':'42K' }[distance];
+  if (prKey && time) {
+    const existing = userPRs[prKey];
+    if (!existing || timeToSec(time) < timeToSec(existing.time)) {
+      userPRs[prKey] = { time, date };
+      savePRsLocal();
+      toast('Gara salvata! Nuovo PR! 🏅🔥');
+    } else {
+      toast('Gara salvata!');
+    }
+  } else {
+    toast('Gara salvata!');
+  }
+
+  closeModal('race-modal');
+  renderRaces();
+}
+
+function deleteRace(id) {
+  if (!confirm('Eliminare questa gara?')) return;
+  userRaces = userRaces.filter(r => r.id !== id);
+  saveRacesLocal();
+  renderRaceList();
+}
+
+function timeToSec(t) {
+  const p = t.split(':').map(Number);
+  return p.length === 3 ? p[0]*3600 + p[1]*60 + p[2] : p[0]*60 + p[1];
+}
+
 // PROGRESS
 function renderProgress() {
   renderBarChart();
   renderTypeDistribution();
   renderStreak();
 }
- 
+
 function renderBarChart() {
   const el = document.getElementById('bar-chart');
-  if (!userLogs.length) { el.innerHTML = '<div class="empty" style="padding:10px 0">Nessun dato</div>'; return; }
+  if (!userLogs.length) { el.innerHTML = '<div class="empty" style="padding:8px 0">Nessun dato</div>'; return; }
   const weeks = {};
   userLogs.forEach(l => {
     const d = new Date(l.date);
@@ -1861,36 +1932,35 @@ function renderBarChart() {
   const max = Math.max(...sorted.map(w => w[1]), 1);
   el.innerHTML = sorted.map(([date, count]) => {
     const d = new Date(date);
-    const lbl = `${d.getDate()}/${d.getMonth()+1}`;
     const pct = Math.round(count/max*100);
     return `<div class="bar-col">
       <div class="bar-bg"><div class="bar-fill" style="height:${pct}%"></div></div>
-      <div class="bar-lbl">${lbl}</div>
+      <div class="bar-lbl">${d.getDate()}/${d.getMonth()+1}</div>
     </div>`;
   }).join('');
 }
- 
+
 function renderTypeDistribution() {
   const el = document.getElementById('type-dist');
-  if (!userLogs.length) { el.innerHTML = '<div style="color:var(--ink3);font-size:13px;font-weight:300">Nessun dato</div>'; return; }
+  if (!userLogs.length) { el.innerHTML = '<div style="color:var(--ink3);font-size:12px">Nessun dato</div>'; return; }
   const counts = {};
   userLogs.forEach(l => counts[l.type] = (counts[l.type]||0) + 1);
   const total = userLogs.length;
   el.innerHTML = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([type, count]) => {
     const m = TYPE_META[type] || TYPE_META.altro;
     const pct = Math.round(count/total*100);
-    return `<div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <span style="font-size:13px">${m.label}</span>
-        <span style="font-size:11px;color:var(--ink3);font-family:var(--font-mono)">${count} · ${pct}%</span>
+    return `<div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:12px">${m.label}</span>
+        <span style="font-size:10px;color:var(--ink3);font-family:var(--font-mono)">${count} · ${pct}%</span>
       </div>
-      <div style="height:4px;background:var(--paper2);border-radius:2px">
+      <div style="height:3px;background:var(--bg2);border-radius:2px">
         <div style="height:100%;width:${pct}%;background:${m.color};border-radius:2px"></div>
       </div>
     </div>`;
   }).join('');
 }
- 
+
 function renderStreak() {
   const el = document.getElementById('streak-grid');
   const done = new Set(userLogs.map(l => l.date));
@@ -1902,20 +1972,18 @@ function renderStreak() {
   }
   el.innerHTML = html;
 }
- 
+
 // PROGRAM
 function renderProgram() {
   const el = document.getElementById('program-content');
   if (!userProgram) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">✦</div>Nessun programma<br><br><button class="btn btn-primary" onclick="goTo(\'onboarding\')">Genera programma</button></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-icon">✦</div>Nessun programma<br><br><button class="btn btn-accent" onclick="goTo(\'onboarding\')">Genera programma</button></div>';
     return;
   }
   document.getElementById('prog-sub').textContent =
     `${userProgram.weeks.length} settimane · generato il ${formatDate(userProgram.generatedAt)}`;
- 
   const done = new Set(userLogs.map(l => l.date));
   const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
- 
   let html = '';
   userProgram.weeks.forEach(w => {
     html += `<div class="program-week">
@@ -1933,15 +2001,14 @@ function renderProgram() {
     });
     html += '</div>';
   });
- 
   el.innerHTML = html;
 }
- 
+
 // SESSION MODAL
 function encodeSession(s) {
   return `'${JSON.stringify(s).replace(/'/g,"&#39;").replace(/"/g,'&quot;')}'`;
 }
- 
+
 function openSessionModal(raw) {
   let s;
   try { s = typeof raw === 'string' ? JSON.parse(raw.replace(/&quot;/g,'"').replace(/&#39;/g,"'")) : raw; }
@@ -1951,28 +2018,27 @@ function openSessionModal(raw) {
   const done = new Set(userLogs.map(l => l.date));
   document.getElementById('sm-title').textContent = s.name;
   document.getElementById('sm-body').innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
       <span class="tag ${m.tag}">${m.label}</span>
-      <span style="font-size:12px;color:var(--ink3);font-family:var(--font-mono)">${formatDate(s.date)} · ${s.duration||'—'}</span>
+      <span style="font-size:11px;color:var(--ink3);font-family:var(--font-mono)">${formatDate(s.date)} · ${s.duration||'—'}</span>
       ${done.has(s.date) ? '<span class="tag tag-done" style="margin-left:auto">✓ Fatto</span>' : ''}
     </div>
-    ${s.description ? `<div style="font-size:14px;color:var(--ink2);margin-bottom:14px;line-height:1.6;font-weight:300">${s.description}</div>` : ''}
-    ${s.blocks?.length ? `<div style="display:flex;flex-direction:column;gap:8px">
-      ${s.blocks.map(b => `
-        <div style="display:flex;gap:10px;font-size:13px;color:var(--ink2);line-height:1.5;font-weight:300">
-          <div style="width:5px;height:5px;border-radius:50%;background:${m.color};margin-top:6px;flex-shrink:0"></div>
-          <span>${b}</span>
-        </div>`).join('')}
+    ${s.description ? `<div style="font-size:13px;color:var(--ink2);margin-bottom:12px;line-height:1.65;font-weight:300">${s.description}</div>` : ''}
+    ${s.blocks?.length ? `<div style="display:flex;flex-direction:column;gap:7px">
+      ${s.blocks.map(b => `<div style="display:flex;gap:8px;font-size:12px;color:var(--ink2);line-height:1.5;font-weight:300">
+        <div style="width:4px;height:4px;border-radius:50%;background:${m.color};margin-top:6px;flex-shrink:0"></div>
+        <span>${b}</span>
+      </div>`).join('')}
     </div>` : ''}`;
   openModal('session-modal');
 }
- 
+
 function logFromSession() {
   if (!currentSession) return;
   closeModal('session-modal');
   openLogModal(currentSession.date, currentSession.type);
 }
- 
+
 // LOG MODAL
 function openLogModal(date, type) {
   logRating = null;
@@ -1984,12 +2050,12 @@ function openLogModal(date, type) {
   document.getElementById('log-notes').value = '';
   openModal('log-modal');
 }
- 
+
 function setRating(r) {
   logRating = r;
   document.querySelectorAll('.r-btn').forEach(b => b.classList.toggle('sel', parseInt(b.dataset.r) === r));
 }
- 
+
 async function saveLog() {
   const date     = document.getElementById('log-date').value;
   const type     = document.getElementById('log-type').value;
@@ -1997,18 +2063,17 @@ async function saveLog() {
   const distance = parseFloat(document.getElementById('log-distance').value) || 0;
   const notes    = document.getElementById('log-notes').value.trim();
   if (!date || !type) { toast('Inserisci almeno data e tipo'); return; }
- 
   const log = { id: Date.now().toString(), date, type, duration, distance, rating: logRating, notes };
   await saveLog_backend(log);
   await loadUserData();
   closeModal('log-modal');
-  toast('Allenamento salvato!');
+  toast('Allenamento salvato! ✓');
   renderLog(); renderDashboard(); renderProgress();
 }
- 
-// ══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════
 // UTILS
-// ══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 function today() { return dateStr(new Date()); }
 function dateStr(d) { return d.toISOString().split('T')[0]; }
 function formatDate(ds) {
@@ -2031,10 +2096,9 @@ function calcStreak() {
   while (weeks.has(dateStr(cur))) { streak++; cur.setDate(cur.getDate() - 7); }
   return streak;
 }
- 
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
- 
+
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -2042,10 +2106,10 @@ function toast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
 }
- 
-// ══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════
 // INIT
-// ══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 async function init() {
   if (sb) {
     const { data: { session } } = await sb.auth.getSession();
@@ -2067,10 +2131,9 @@ async function init() {
     });
   }
 }
- 
+
 init();
- 
-// gestione resize: mostra/nascondi mobile nav
+
 window.addEventListener('resize', () => {
   const mobileNav = document.getElementById('mobile-nav');
   const appActive = document.getElementById('page-app').classList.contains('active');
